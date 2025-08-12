@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowLeft, RotateCcw, Upload, Plus, Book, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File } from 'lucide-react';
+import { Sparkles, ArrowLeft, RotateCcw, Upload, Plus, Book, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send } from 'lucide-react';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
@@ -809,13 +809,21 @@ function App() {
             <p className="text-base text-gray-400 mb-12">Give a short description to create a Chronicle.</p>
             
             <form onSubmit={handleQuerySubmit} className="w-full relative mb-8">
-              <input 
-                type="text" 
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="What would you like to create today?" 
-                className="w-full h-12 px-4 bg-[#1A1A1A] border border-gray-700 rounded-lg focus:ring-1 focus:ring-gray-500 focus:border-gray-500 focus:outline-none placeholder-gray-500 text-base text-white"
-              />
+              <div className="relative">
+                <input 
+                  type="text" 
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="What would you like to create today?" 
+                  className="w-full h-12 px-4 pr-12 bg-[#1A1A1A] border border-gray-700 rounded-lg focus:ring-1 focus:ring-gray-500 focus:border-gray-500 focus:outline-none placeholder-gray-500 text-base text-white"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
             </form>
 
             <div className="w-full flex flex-col items-center">
