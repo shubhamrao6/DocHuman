@@ -31,7 +31,7 @@ function App() {
 • **Documentation:** Take thorough notes and record important observations during the interview.`
     }
   ]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [emailFormData, setEmailFormData] = useState({
@@ -248,40 +248,30 @@ function App() {
 
   // Sidebar component
   const Sidebar = () => (
-    <aside 
-      className={`${sidebarCollapsed ? 'w-16 hover:w-64' : 'w-64'} bg-[#0D0D0D] flex flex-col p-4 border-r border-gray-800 transition-all duration-300 group`}
-      onMouseEnter={() => setSidebarCollapsed(false)}
-      onMouseLeave={() => setSidebarCollapsed(true)}
-    >
+    <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#0D0D0D] flex flex-col p-4 border-r border-gray-800 transition-all duration-300`}>
       <div className="flex items-center gap-2.5 p-2 mb-6">
         <Sparkles className="w-7 h-7 text-gray-200 flex-shrink-0" />
-        <h1 className={`text-xl font-bold text-gray-100 transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>DocHuman</h1>
-        <button 
-          onClick={toggleSidebar}
-          className={`ml-auto p-1 text-gray-400 hover:text-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}
-        >
-          {sidebarCollapsed ? <ChevronDown className="w-4 h-4 rotate-90" /> : <ChevronDown className="w-4 h-4 -rotate-90" />}
-        </button>
+        {!sidebarCollapsed && <h1 className="text-xl font-bold text-gray-100">DocHuman</h1>}
       </div>
 
       <button className={`w-full text-left flex items-center gap-3 px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-sm font-medium text-gray-100 hover:bg-gray-800 transition-colors mb-6 ${sidebarCollapsed ? 'justify-center' : ''}`}>
         <Plus className="w-4 h-4 text-gray-400 flex-shrink-0" />
-        <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>Connect a new Source</span>
+        {!sidebarCollapsed && 'Connect a new Source'}
       </button>
 
       <nav className="flex-grow space-y-1">
         <span className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''}`}>
           <Book className="w-5 h-5 flex-shrink-0" />
-          <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>Knowledge Base</span>
+          {!sidebarCollapsed && <span>Knowledge Base</span>}
         </span>
         
         <div>
           <button className={`w-full flex ${sidebarCollapsed ? 'justify-center' : 'justify-between'} items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors`}>
             <div className="flex items-center gap-3">
               <Link className="w-5 h-5 flex-shrink-0" />
-              <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>Data Sources</span>
+              {!sidebarCollapsed && <span>Data Sources</span>}
             </div>
-            <ChevronDown className={`w-3 h-3 transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`} />
+            {!sidebarCollapsed && <ChevronDown className="w-3 h-3" />}
           </button>
         </div>
         
@@ -292,46 +282,46 @@ function App() {
           } transition-colors`}
         >
           <Upload className="w-5 h-5 flex-shrink-0" />
-          <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>Upload Files</span>
+          {!sidebarCollapsed && <span>Upload Files</span>}
         </span>
         
         <span className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''}`}>
           <Users className="w-5 h-5 flex-shrink-0" />
-          <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>Team</span>
+          {!sidebarCollapsed && <span>Team</span>}
         </span>
         
         <div>
           <button className={`w-full flex ${sidebarCollapsed ? 'justify-center' : 'justify-between'} items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors`}>
             <div className="flex items-center gap-3">
               <Code className="w-5 h-5 flex-shrink-0" />
-              <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>API</span>
+              {!sidebarCollapsed && <span>API</span>}
             </div>
-            <ChevronDown className={`w-3 h-3 transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`} />
+            {!sidebarCollapsed && <ChevronDown className="w-3 h-3" />}
           </button>
         </div>
         
         <span className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''}`}>
           <Settings className="w-5 h-5 flex-shrink-0" />
-          <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>Settings</span>
+          {!sidebarCollapsed && <span>Settings</span>}
         </span>
       </nav>
 
       <div className="mt-auto">
         <button className={`w-full text-left flex items-center gap-3 px-3 py-2.5 bg-gray-900 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 transition-colors mb-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
           <HelpCircle className="w-4 h-4 flex-shrink-0" />
-          <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>Support</span>
+          {!sidebarCollapsed && <span>Support</span>}
         </button>
         <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
-          <div className={`flex items-center gap-2 transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
+          {!sidebarCollapsed && <div className="flex items-center gap-2">
             <button className="h-9 w-9 flex items-center justify-center bg-gray-900 rounded-lg text-gray-400 hover:bg-gray-800 transition-colors">
               <span className="text-sm">D</span>
             </button>
             <button className="h-9 w-9 flex items-center justify-center bg-gray-900 rounded-lg text-gray-400 hover:bg-gray-800 transition-colors">
               <span className="text-sm">X</span>
             </button>
-          </div>
+          </div>}
           <button className={`flex items-center gap-2 px-3 py-2 bg-gray-900 rounded-lg text-sm text-gray-400 hover:bg-gray-800 transition-colors ${sidebarCollapsed ? 'justify-center' : ''}`}>
-            <span className={`transition-opacity duration-300 ${sidebarCollapsed ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>Log out</span>
+            {!sidebarCollapsed && <span>Log out</span>}
             <LogOut className="w-4 h-4 flex-shrink-0" />
           </button>
         </div>
@@ -793,12 +783,6 @@ function App() {
       <div className="flex-1 flex flex-col p-6">
         <header className="w-full flex justify-between items-center">
           <div>
-            <button 
-              onClick={toggleSidebar}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors mr-3"
-            >
-              {sidebarCollapsed ? <ChevronDown className="w-4 h-4 rotate-90" /> : <ChevronDown className="w-4 h-4 -rotate-90" />}
-            </button>
             <button 
               onClick={navigateToLanding}
               className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors"
