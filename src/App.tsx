@@ -595,7 +595,7 @@ function App() {
                 )}
               </div>
 
-              <section className="mt-16 mb-16">
+              <section className="mt-16">
                 <h3 className="text-2xl font-bold text-white text-center mb-8">Connected Data Sources</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   <div className="bg-gradient-to-br from-pink-500 to-orange-400 p-1 rounded-2xl shadow-lg">
@@ -629,51 +629,6 @@ function App() {
                       </div>
                       <h4 className="font-bold text-white text-lg">Product Roadmap</h4>
                       <p className="text-sm text-gray-400">Notion</p>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section>
-                <h3 className="text-2xl font-bold text-white text-center mb-8">Connect External Sources</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-[#1A1A1A] border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-colors cursor-pointer group">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-colors">
-                        <FileText className="w-6 h-6 text-white" />
-                      </div>
-                      <h4 className="font-semibold text-white text-sm mb-2">Confluence</h4>
-                      <p className="text-xs text-gray-400">Connect your Confluence workspace</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-[#1A1A1A] border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-colors cursor-pointer group">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-400 transition-colors">
-                        <FileText className="w-6 h-6 text-white" />
-                      </div>
-                      <h4 className="font-semibold text-white text-sm mb-2">SharePoint</h4>
-                      <p className="text-xs text-gray-400">Connect your SharePoint sites</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-[#1A1A1A] border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-colors cursor-pointer group">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-500 transition-colors">
-                        <FileText className="w-6 h-6 text-white" />
-                      </div>
-                      <h4 className="font-semibold text-white text-sm mb-2">Google Drive</h4>
-                      <p className="text-xs text-gray-400">Connect your Google Drive files</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-[#1A1A1A] border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-colors cursor-pointer group">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-500 transition-colors">
-                        <FileText className="w-6 h-6 text-white" />
-                      </div>
-                      <h4 className="font-semibold text-white text-sm mb-2">Gmail</h4>
-                      <p className="text-xs text-gray-400">Connect your Gmail account</p>
                     </div>
                   </div>
                 </div>
