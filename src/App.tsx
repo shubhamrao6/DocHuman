@@ -31,7 +31,7 @@ function App() {
 • **Documentation:** Take thorough notes and record important observations during the interview.`
     }
   ]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [emailFormData, setEmailFormData] = useState({
@@ -783,6 +783,12 @@ function App() {
       <div className="flex-1 flex flex-col p-6">
         <header className="w-full flex justify-between items-center">
           <div>
+            <button 
+              onClick={toggleSidebar}
+              className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors mr-3"
+            >
+              {sidebarCollapsed ? <ChevronDown className="w-4 h-4 rotate-90" /> : <ChevronDown className="w-4 h-4 -rotate-90" />}
+            </button>
             <button 
               onClick={navigateToLanding}
               className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors"
