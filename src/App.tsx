@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowLeft, RotateCcw, Upload, Plus, Book, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send } from 'lucide-react';
+import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send } from 'lucide-react';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
@@ -250,7 +250,7 @@ function App() {
   const Sidebar = () => (
     <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#0D0D0D] flex flex-col p-4 border-r border-gray-800 transition-all duration-300`}>
       <div className="flex items-center gap-2.5 p-2 mb-6">
-        <Book className="w-7 h-7 text-gray-200 flex-shrink-0" />
+        <Sparkles className="w-7 h-7 text-gray-200 flex-shrink-0" />
         {!sidebarCollapsed && <h1 className="text-xl font-bold text-gray-100">DocHuman</h1>}
       </div>
 
@@ -798,7 +798,7 @@ function App() {
             </button>
           </div>
           <div className="flex items-center space-x-2 text-lg font-medium text-gray-200">
-            <Sparkles className="w-[18px] h-[18px] text-gray-400" />
+            <Book className="w-[18px] h-[18px] text-gray-400" />
             <span>DocHuman</span>
           </div>
           <div className="w-[88px] flex justify-end">
