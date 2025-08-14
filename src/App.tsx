@@ -54,16 +54,6 @@ function App() {
     email: '',
     password: ''
   });
-  const [emailFormData, setEmailFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
-  const [emailFormErrors, setEmailFormErrors] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
 
   const navigateToQuery = () => {
     setCurrentScreen('query');
