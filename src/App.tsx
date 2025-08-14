@@ -1068,12 +1068,12 @@ function App() {
             <span>DocHuman</span>
           </div>
           <div className="w-[88px] flex justify-end">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">S</span>
-              </div>
-              <span className="text-white text-sm font-medium">Savin</span>
-            </div>
+            <button 
+              onClick={navigateToLogin}
+              className="text-gray-300 hover:text-white transition-colors font-medium"
+            >
+              Login
+            </button>
           </div>
         </header>
 
