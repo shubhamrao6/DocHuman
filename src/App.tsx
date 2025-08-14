@@ -1,36 +1,11 @@
 import React, { useState } from 'react';
+import { sendMessage, ChatMessage, initialAssistantMessage } from './chatService';
 import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send, ChevronRight, Sparkles } from 'lucide-react';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
   const [query, setQuery] = useState('');
-  const [chatMessages, setChatMessages] = useState<Array<{type: 'user' | 'assistant', content: string}>>([
-    {
-      type: 'assistant',
-      content: `# Post-Interview
-
-1. Transcribe and Analyze:
-   • Transcribe the interview recordings if necessary.
-   • Identify key themes, patterns, and insights from the responses.
-
-2. Share Findings:
-   • Compile findings into a report or presentation.
-   • Highlight actionable insights and recommendations for the design and product teams.
-
-3. Follow Up:
-   • Send a thank-you note to participants.
-   • Provide any promised incentives or rewards.
-   • Share any high-level findings or updates with participants, if appropriate.
-
-# Tips for Effective Interviews
-
-• **Active Listening:** Pay close attention to participants' responses and show genuine interest.
-• **Neutral Stance:** Avoid leading questions or expressing your own opinions.
-• **Adaptability:** Be prepared to adjust the interview flow based on participants' responses.
-• **Empathy:** Understand and respect participants' perspectives and experiences.
-• **Documentation:** Take thorough notes and record important observations during the interview.`
-    }
-  ]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([initialAssistantMessage]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -59,27 +34,16 @@ function App() {
     }
   };
 
-  const handleQuerySubmit = (e: React.FormEvent) => {
+  const handleQuerySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentScreen === 'results' && query.trim()) {
       // Add user message
       setChatMessages(prev => [...prev, { type: 'user', content: query.trim() }]);
-      
-      // Clear query immediately
+      const userQuery = query.trim();
       setQuery('');
-      
-      // Simulate AI response (replace with actual AI integration)
-      setTimeout(() => {
-        const responses = [
-          "Based on your uploaded documents, here are the key insights I found regarding your query. The analysis shows several important patterns that align with your research objectives.",
-          "I've analyzed your knowledge base and found relevant information about this topic. Here's what I discovered from the connected data sources and uploaded files.",
-          "From the documents in your knowledge base, I can provide the following analysis:\n\n• Key finding 1: Relevant data point from your documents\n• Key finding 2: Cross-referenced information\n• Key finding 3: Actionable insights based on your query",
-          "Let me search through your uploaded content to provide you with accurate information. The results indicate several relevant matches to your question.",
-          "Based on the data sources you've connected, here's what I found relevant to your question:\n\n**Summary:** Your query relates to multiple documents in your knowledge base.\n\n**Key Points:**\n• Primary insight from document analysis\n• Secondary findings from cross-referencing\n• Recommendations based on the data"
-        ];
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        setChatMessages(prev => [...prev, { type: 'assistant', content: randomResponse }]);
-      }, 1000);
+      // Get AI response from chatService
+      const aiMessage = await sendMessage(userQuery, chatMessages);
+      setChatMessages(prev => [...prev, aiMessage]);
     } else if (currentScreen !== 'results') {
       navigateToResults();
     }
