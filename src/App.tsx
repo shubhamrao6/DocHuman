@@ -320,7 +320,7 @@ function App() {
         return <br key={index} />;
       }
       
-      // Handle regular text
+      // Handle regular paragraphs
       return <p key={index} className="text-sm text-gray-300 mb-2">{line}</p>;
     });
     
