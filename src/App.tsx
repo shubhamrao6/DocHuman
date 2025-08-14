@@ -802,8 +802,7 @@ export default function App() {
           </main>
           
           <div className="w-full mt-8 px-4 sm:px-10">
-            <div className="w-full flex justify-center">
-              <form onSubmit={handleQuerySubmit} className="w-full max-w-2xl mb-6">
+            <form onSubmit={handleQuerySubmit} className="w-full max-w-2xl mx-auto mb-6">
               <div className="relative">
                 <input 
                   type="text" 
@@ -820,7 +819,6 @@ export default function App() {
                 </button>
               </div>
             </form>
-            </div>
           </div>
           
           <footer className="w-full flex justify-between items-center px-10">
@@ -878,8 +876,7 @@ export default function App() {
         </header>
 
         <main className="flex-grow flex flex-col items-center justify-center -mt-10">
-          <div className="w-full flex justify-center">
-            <div className="w-full max-w-2xl flex flex-col items-center text-center">
+          <div className="w-full max-w-2xl flex flex-col items-center text-center">
             <h1 className="text-4xl font-normal text-white mb-3">Ask DocHuman</h1>
             <p className="text-base text-gray-400 mb-12">Ask questions about your knowledge base and get intelligent answers.</p>
             
@@ -930,7 +927,6 @@ export default function App() {
                 </button>
               </div>
             </div>
-          </div>
           </div>
         </main>
 
