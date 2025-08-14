@@ -146,14 +146,14 @@ function App() {
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailFormData.email || !emailFormData.email.trim()) {
+    if (!emailFormData.email.trim()) {
       errors.email = 'Email is required';
     } else if (!emailRegex.test(emailFormData.email)) {
       errors.email = 'Please enter a valid email address';
     }
 
     // Password validation
-    if (!emailFormData.password || !emailFormData.password.trim()) {
+    if (!emailFormData.password) {
       errors.password = 'Password is required';
     } else if (emailFormData.password.length < 6) {
       errors.password = 'Password must be at least 6 characters';
