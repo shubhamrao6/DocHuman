@@ -105,10 +105,6 @@ function App() {
     setCurrentScreen('login');
   };
 
-  const navigateToSignup = () => {
-    setCurrentScreen('signup');
-  };
-
   const handleGoogleLogin = () => {
     // Handle Google login logic here
     console.log('Google login clicked');
