@@ -720,82 +720,84 @@ function App() {
           </header>
 
           <main className="flex-grow overflow-y-auto px-4 sm:px-10 py-4">
-            <div className="w-full max-w-2xl mx-auto space-y-6">
-              {chatMessages.map((message, index) => (
-                <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  {message.type === 'user' ? (
-                    <div className="bg-white text-black px-4 py-3 rounded-2xl max-w-[80%] text-sm">
-                      {message.content}
-                    </div>
-                  ) : (
-                    <div className="w-full text-white leading-relaxed bg-[#1A1A1A] rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2),0_0_80px_rgba(255,255,255,0.1)] p-10">
-                      {formatMessageContent(message.content)}
-                      
-                      {/* Sources Section */}
-                      <div className="mt-8 pt-6 border-t border-gray-700">
-                        <h4 className="text-sm font-medium text-gray-400 mb-4">Sources</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <a 
-                            href="#" 
-                            className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors group"
-                          >
-                            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                                <rect width="24" height="24" rx="3" fill="#000000"/>
-                                <path d="M4 7.5C4 6.11929 5.11929 5 6.5 5H17.5C18.8807 5 20 6.11929 20 7.5V16.5C20 17.8807 18.8807 19 17.5 19H6.5C5.11929 19 4 17.8807 4 16.5V7.5Z" fill="#FFFFFF"/>
-                                <path d="M8 9H16V10H8V9ZM8 11H16V12H8V11ZM8 13H13V14H8V13Z" fill="#000000"/>
-                              </svg>
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
-                                User Research Guidelines.pdf
-                              </p>
-                              <p className="text-xs text-gray-500">Notion</p>
-                            </div>
-                          </a>
-                          
-                          <a 
-                            href="#" 
-                            className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors group"
-                          >
-                            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                                <path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12z" fill="#0078D4"/>
-                                <path d="M8.5 7.5h7v1.5h-7V7.5zm0 3h7V12h-7v-1.5zm0 3h5V15h-5v-1.5z" fill="white"/>
-                              </svg>
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
-                                Interview Best Practices.docx
-                              </p>
-                              <p className="text-xs text-gray-500">SharePoint</p>
-                            </div>
-                          </a>
-                          
-                          <a 
-                            href="#" 
-                            className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors group"
-                          >
-                            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                                <path d="M6.5 2C4.567 2 3 3.567 3 5.5v13C3 20.433 4.567 22 6.5 22h11c1.933 0 3.5-1.567 3.5-3.5v-13C21 3.567 19.433 2 17.5 2h-11z" fill="#4285F4"/>
-                                <path d="M15.5 8.5L12 12l-3.5-3.5L7 10l5 5 5-5-1.5-1.5z" fill="white"/>
-                                <path d="M7 14h10v1H7v-1zm0 2h7v1H7v-1z" fill="white"/>
-                              </svg>
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
-                                Research Methodology.pdf
-                              </p>
-                              <p className="text-xs text-gray-500">Google Drive</p>
-                            </div>
-                          </a>
+            <div className="w-full max-w-4xl mx-auto flex justify-center">
+              <div className="w-full max-w-2xl space-y-6">
+                {chatMessages.map((message, index) => (
+                  <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    {message.type === 'user' ? (
+                      <div className="bg-white text-black px-4 py-3 rounded-2xl max-w-[80%] text-sm">
+                        {message.content}
+                      </div>
+                    ) : (
+                      <div className="w-full text-white leading-relaxed bg-[#1A1A1A] rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2),0_0_80px_rgba(255,255,255,0.1)] p-10">
+                        {formatMessageContent(message.content)}
+                        
+                        {/* Sources Section */}
+                        <div className="mt-8 pt-6 border-t border-gray-700">
+                          <h4 className="text-sm font-medium text-gray-400 mb-4">Sources</h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <a 
+                              href="#" 
+                              className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors group"
+                            >
+                              <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                                  <rect width="24" height="24" rx="3" fill="#000000"/>
+                                  <path d="M4 7.5C4 6.11929 5.11929 5 6.5 5H17.5C18.8807 5 20 6.11929 20 7.5V16.5C20 17.8807 18.8807 19 17.5 19H6.5C5.11929 19 4 17.8807 4 16.5V7.5Z" fill="#FFFFFF"/>
+                                  <path d="M8 9H16V10H8V9ZM8 11H16V12H8V11ZM8 13H13V14H8V13Z" fill="#000000"/>
+                                </svg>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
+                                  User Research Guidelines.pdf
+                                </p>
+                                <p className="text-xs text-gray-500">Notion</p>
+                              </div>
+                            </a>
+                            
+                            <a 
+                              href="#" 
+                              className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors group"
+                            >
+                              <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                                  <path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12z" fill="#0078D4"/>
+                                  <path d="M8.5 7.5h7v1.5h-7V7.5zm0 3h7V12h-7v-1.5zm0 3h5V15h-5v-1.5z" fill="white"/>
+                                </svg>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
+                                  Interview Best Practices.docx
+                                </p>
+                                <p className="text-xs text-gray-500">SharePoint</p>
+                              </div>
+                            </a>
+                            
+                            <a 
+                              href="#" 
+                              className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors group"
+                            >
+                              <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                                  <path d="M6.5 2C4.567 2 3 3.567 3 5.5v13C3 20.433 4.567 22 6.5 22h11c1.933 0 3.5-1.567 3.5-3.5v-13C21 3.567 19.433 2 17.5 2h-11z" fill="#4285F4"/>
+                                  <path d="M15.5 8.5L12 12l-3.5-3.5L7 10l5 5 5-5-1.5-1.5z" fill="white"/>
+                                  <path d="M7 14h10v1H7v-1zm0 2h7v1H7v-1z" fill="white"/>
+                                </svg>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
+                                  Research Methodology.pdf
+                                </p>
+                                <p className="text-xs text-gray-500">Google Drive</p>
+                              </div>
+                            </a>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </main>
           
