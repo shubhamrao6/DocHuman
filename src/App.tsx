@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send, ChevronRight, Sparkles } from 'lucide-react';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login' | 'signup'>('landing');
+  const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
   const [query, setQuery] = useState('');
   const [chatMessages, setChatMessages] = useState<Array<{type: 'user' | 'assistant', content: string}>>([
     {
@@ -34,23 +34,13 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [signInFormData, setSignInFormData] = useState({
+  const [emailFormData, setEmailFormData] = useState({
+    username: '',
     email: '',
     password: ''
   });
-  const [signInFormErrors, setSignInFormErrors] = useState({
-    email: '',
-    password: ''
-  });
-  const [signUpFormData, setSignUpFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: ''
-  });
-  const [signUpFormErrors, setSignUpFormErrors] = useState({
-    firstName: '',
-    lastName: '',
+  const [emailFormErrors, setEmailFormErrors] = useState({
+    username: '',
     email: '',
     password: ''
   });
@@ -471,121 +461,6 @@ function App() {
               </div>
             </>
           )}
-        </div>
-      </div>
-    );
-  }
-
-  if (currentScreen === 'signup') {
-    return (
-      <div className="bg-black min-h-screen flex items-center justify-center">
-        <div className="bg-[#2A2A2A] rounded-2xl p-8 w-full max-w-md mx-4">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-6">Sign Up</h1>
-            <p className="text-gray-300">Create your account to get started</p>
-          </div>
-
-          <form onSubmit={handleSignUpFormSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
-                First Name
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                value={signUpFormData.firstName}
-                onChange={(e) => handleSignUpInputChange('firstName', e.target.value)}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${
-                  signUpFormErrors.firstName 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'
-                }`}
-                placeholder="Enter your first name"
-              />
-              {signUpFormErrors.firstName && (
-                <p className="mt-1 text-sm text-red-400">{signUpFormErrors.firstName}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">
-                Last Name
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                value={signUpFormData.lastName}
-                onChange={(e) => handleSignUpInputChange('lastName', e.target.value)}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${
-                  signUpFormErrors.lastName 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'
-                }`}
-                placeholder="Enter your last name"
-              />
-              {signUpFormErrors.lastName && (
-                <p className="mt-1 text-sm text-red-400">{signUpFormErrors.lastName}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="signupEmail" className="block text-sm font-medium text-gray-300 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                id="signupEmail"
-                value={signUpFormData.email}
-                onChange={(e) => handleSignUpInputChange('email', e.target.value)}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${
-                  signUpFormErrors.email 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'
-                }`}
-                placeholder="Enter your email"
-              />
-              {signUpFormErrors.email && (
-                <p className="mt-1 text-sm text-red-400">{signUpFormErrors.email}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="signupPassword" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                id="signupPassword"
-                value={signUpFormData.password}
-                onChange={(e) => handleSignUpInputChange('password', e.target.value)}
-                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${
-                  signUpFormErrors.password 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'
-                }`}
-                placeholder="Enter your password"
-              />
-              {signUpFormErrors.password && (
-                <p className="mt-1 text-sm text-red-400">{signUpFormErrors.password}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Sign Up
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <button 
-              onClick={navigateToLogin}
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              ← Already have an account? Sign in
-            </button>
-          </div>
         </div>
       </div>
     );
