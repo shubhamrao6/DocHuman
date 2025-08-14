@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send, ChevronRight, Sparkles } from 'lucide-react';
 
-export default function App() {
+function App() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
   const [query, setQuery] = useState('');
   const [chatMessages, setChatMessages] = useState<Array<{type: 'user' | 'assistant', content: string}>>([
@@ -720,7 +720,7 @@ export default function App() {
           </header>
 
           <main className="flex-grow overflow-y-auto px-4 sm:px-10 py-4">
-            <div className="h-full flex items-center justify-center">
+            <div className="w-full max-w-4xl mx-auto flex justify-center">
               <div className="w-full max-w-2xl space-y-6">
                 {chatMessages.map((message, index) => (
                   <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -934,3 +934,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;
