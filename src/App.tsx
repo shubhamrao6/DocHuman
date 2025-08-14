@@ -832,14 +832,7 @@ function App() {
             <ChevronRight className="w-[18px] h-[18px] text-gray-400" />
             <span>DocHuman</span>
           </div>
-          <div className="w-[88px] flex justify-end">
-            <button 
-              onClick={navigateToLogin}
-              className="text-gray-300 hover:text-white transition-colors font-medium"
-            >
-              Login
-            </button>
-          </div>
+          <div className="w-[88px]"></div>
         </header>
 
         <main className="flex-grow flex flex-col items-center justify-center -mt-10">
