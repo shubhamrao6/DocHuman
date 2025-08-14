@@ -33,26 +33,12 @@ function App() {
   ]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [showSignUpForm, setShowSignUpForm] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [emailFormData, setEmailFormData] = useState({
     email: '',
     password: ''
   });
   const [emailFormErrors, setEmailFormErrors] = useState({
-    email: '',
-    password: ''
-  });
-  const [signUpFormData, setSignUpFormData] = useState({
-    firstName: '',
-    surname: '',
-    email: '',
-    password: ''
-  });
-  const [signUpFormErrors, setSignUpFormErrors] = useState({
-    firstName: '',
-    surname: '',
     email: '',
     password: ''
   });
@@ -633,20 +619,12 @@ function App() {
               <Sparkles className="w-[15px] h-[15px] text-gray-400" />
               <span>DocHuman</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={navigateToLogin}
-                className="text-white/80 hover:text-white transition-colors font-medium"
-              >
-                Login
-              </button>
-              <button 
-                onClick={navigateToSignUp}
-                className="bg-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors font-medium"
-              >
-                Sign Up
-              </button>
-            </div>
+            <button 
+              onClick={navigateToLogin}
+              className="text-white/80 hover:text-white transition-colors font-medium"
+            >
+              Login
+            </button>
           </header>
 
           <div className="flex flex-col items-center text-center max-w-2xl">
