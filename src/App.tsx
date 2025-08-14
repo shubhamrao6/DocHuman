@@ -535,6 +535,12 @@ function App() {
               ← Back to home
             </button>
           </div>
+
+          <div className="mt-6 text-center text-xs text-gray-500">
+            <p>By creating an account, you acknowledge that you have read</p>
+            <p>and agree to DocHuman's <span className="underline cursor-pointer hover:text-gray-400">Terms & Conditions</span> and</p>
+            <p><span className="underline cursor-pointer hover:text-gray-400">Privacy Policy</span></p>
+          </div>
         </div>
       </div>
     );
