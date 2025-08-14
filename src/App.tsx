@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send, ChevronRight, Sparkles } from 'lucide-react';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login' | 'signup'>('landing');
+  const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
   const [query, setQuery] = useState('');
   const [chatMessages, setChatMessages] = useState<Array<{type: 'user' | 'assistant', content: string}>>([
     {
@@ -33,17 +33,12 @@ function App() {
   ]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [emailFormData, setEmailFormData] = useState({
-    firstName: '',
-    surname: '',
     email: '',
     password: ''
   });
   const [emailFormErrors, setEmailFormErrors] = useState({
-    firstName: '',
-    surname: '',
     email: '',
     password: ''
   });
@@ -103,10 +98,6 @@ function App() {
 
   const navigateToLogin = () => {
     setCurrentScreen('login');
-  };
-
-  const navigateToSignup = () => {
-    setCurrentScreen('signup');
   };
 
   const handleGoogleLogin = () => {
@@ -636,20 +627,12 @@ function App() {
               <Sparkles className="w-[15px] h-[15px] text-gray-400" />
               <span>DocHuman</span>
             </div>
-            <div className="flex items-center space-x-6">
-              <button 
-                onClick={navigateToSignup}
-                className="text-white/80 hover:text-white transition-colors font-medium"
-              >
-                Sign Up
-              </button>
-              <button 
-                onClick={navigateToLogin}
-                className="text-white/80 hover:text-white transition-colors font-medium"
-              >
-                Login
-              </button>
-            </div>
+            <button 
+              onClick={navigateToLogin}
+              className="text-white/80 hover:text-white transition-colors font-medium"
+            >
+              Login
+            </button>
           </header>
 
           <div className="flex flex-col items-center text-center max-w-2xl">
