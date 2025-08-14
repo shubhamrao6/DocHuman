@@ -133,7 +133,7 @@ function App() {
   const validateEmailForm = () => {
     const errors = {
       username: '',
-    if (!(emailFormData.email || '').trim()) {
+      email: '',
       password: ''
     };
 
@@ -320,7 +320,7 @@ function App() {
         return <br key={index} />;
       }
       
-    if (!(emailFormData.password || '').trim()) {
+      // Handle regular text
       return <p key={index} className="text-sm text-gray-300 mb-2">{line}</p>;
     });
     
