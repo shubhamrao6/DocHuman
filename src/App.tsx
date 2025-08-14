@@ -36,22 +36,12 @@ function App() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [emailFormData, setEmailFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
-  const [emailFormErrors, setEmailFormErrors] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
-  const [signupFormData, setSignupFormData] = useState({
     firstName: '',
     surname: '',
     email: '',
     password: ''
   });
-  const [signupFormErrors, setSignupFormErrors] = useState({
+  const [emailFormErrors, setEmailFormErrors] = useState({
     firstName: '',
     surname: '',
     email: '',
