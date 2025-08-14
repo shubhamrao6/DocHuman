@@ -114,12 +114,6 @@ function App() {
     setCurrentScreen('login');
   };
 
-  const navigateToSignUp = () => {
-    setCurrentScreen('login');
-    setShowSignUpForm(true);
-    setShowEmailForm(false);
-  };
-
   const handleGoogleLogin = () => {
     // Handle Google login logic here
     console.log('Google login clicked');
@@ -160,8 +154,8 @@ function App() {
       // Successful validation - navigate to query screen
       setCurrentScreen('query');
       setShowEmailForm(false);
-      setEmailFormData({ email: '', password: '' });
-      setEmailFormErrors({ email: '', password: '' });
+      setEmailFormData({ username: '', email: '', password: '' });
+      setEmailFormErrors({ username: '', email: '', password: '' });
     }
   };
 
