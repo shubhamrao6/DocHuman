@@ -846,19 +846,11 @@ function App() {
               <Sparkles className="w-[15px] h-[15px] text-gray-400" />
               <span>DocHuman</span>
             </div>
-            <div className="flex items-center space-x-6">
-              <button 
-                onClick={navigateToSignup}
-                className="text-white/80 hover:text-white transition-colors font-medium"
-              >
-                Sign Up
-              </button>
-              <button 
-                onClick={navigateToLogin}
-                className="text-white/80 hover:text-white transition-colors font-medium"
-              >
-                Login
-              </button>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                S
+              </div>
+              <span className="text-white font-medium">Savin</span>
             </div>
           </header>
 
