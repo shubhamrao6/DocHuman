@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send, ChevronRight, Sparkles } from 'lucide-react';
+import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send, ChevronRight } from 'lucide-react';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
