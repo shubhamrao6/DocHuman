@@ -161,47 +161,6 @@ function App() {
     return !errors.username && !errors.email && !errors.password;
   };
 
-  const validateSignupForm = () => {
-    const errors = {
-      firstName: '',
-      surname: '',
-      email: '',
-      password: ''
-    };
-
-    // First name validation
-    if (!signupFormData.firstName || !signupFormData.firstName.trim()) {
-      errors.firstName = 'First name is required';
-    } else if (signupFormData.firstName.length < 2) {
-      errors.firstName = 'First name must be at least 2 characters';
-    }
-
-    // Surname validation
-    if (!signupFormData.surname || !signupFormData.surname.trim()) {
-      errors.surname = 'Surname is required';
-    } else if (signupFormData.surname.length < 2) {
-      errors.surname = 'Surname must be at least 2 characters';
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!signupFormData.email || !signupFormData.email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!emailRegex.test(signupFormData.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-
-    // Password validation
-    if (!signupFormData.password) {
-      errors.password = 'Password is required';
-    } else if (signupFormData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-
-    setSignupFormErrors(errors);
-    return !errors.firstName && !errors.surname && !errors.email && !errors.password;
-  };
-
   const handleEmailFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateEmailForm()) {
@@ -213,37 +172,11 @@ function App() {
     }
   };
 
-  const handleSignupFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateSignupForm()) {
-      // Show success message
-      setShowSuccessMessage(true);
-      
-      // Clear form data
-      setSignupFormData({ firstName: '', surname: '', email: '', password: '' });
-      setSignupFormErrors({ firstName: '', surname: '', email: '', password: '' });
-      
-      // Redirect to query screen after 2 seconds
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-        setCurrentScreen('query');
-      }, 2000);
-    }
-  };
-
   const handleInputChange = (field: string, value: string) => {
     setEmailFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (emailFormErrors[field as keyof typeof emailFormErrors]) {
       setEmailFormErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
-
-  const handleSignupInputChange = (field: string, value: string) => {
-    setSignupFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (signupFormErrors[field as keyof typeof signupFormErrors]) {
-      setSignupFormErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
