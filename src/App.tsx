@@ -686,9 +686,9 @@ function App() {
 
   if (currentScreen === 'results') {
     return (
-      <div className="bg-black text-white font-sans h-screen flex overflow-hidden">
+      <div className="bg-black text-white font-sans min-h-screen flex">
         <Sidebar />
-        <div className="flex-1 flex flex-col relative">
+        <div className="flex-1 flex flex-col p-6">
           <header className="w-full flex justify-between items-center mb-8">
             <div>
               <button 
@@ -719,7 +719,7 @@ function App() {
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto px-4 sm:px-10 py-4 pb-32">
+          <main className="flex-grow overflow-y-auto px-4 sm:px-10 py-4">
             <div className="w-full max-w-2xl mx-auto space-y-6">
               {chatMessages.map((message, index) => (
                 <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -799,7 +799,7 @@ function App() {
             </div>
           </main>
           
-          <div className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 p-6" style={{ marginLeft: sidebarCollapsed ? '4rem' : '16rem' }}>
+          <div className="w-full mt-8 px-4 sm:px-10">
             <form onSubmit={handleQuerySubmit} className="w-full max-w-2xl mx-auto mb-6">
               <div className="relative">
                 <input 
@@ -817,8 +817,9 @@ function App() {
                 </button>
               </div>
             </form>
-            
-            <div className="w-full flex justify-between items-center max-w-2xl mx-auto">
+          </div>
+          
+          <footer className="w-full flex justify-between items-center px-10">
             <div className="flex items-center gap-4">
               <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
                 <RotateCcw className="w-4 h-4" />
@@ -832,8 +833,7 @@ function App() {
             <div>
               <span className="text-sm text-gray-500">1 of 1</span>
             </div>
-            </div>
-          </div>
+          </footer>
         </div>
       </div>
     );
