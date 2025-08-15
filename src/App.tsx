@@ -1,36 +1,13 @@
-import React, { useState } from 'react';
-import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send, ChevronRight, Sparkles } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { sendMessage, ChatMessage } from './chatService';
+import { login } from './authService';
+import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, File, Send, ChevronRight, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
   const [query, setQuery] = useState('');
-  const [chatMessages, setChatMessages] = useState<Array<{type: 'user' | 'assistant', content: string}>>([
-    {
-      type: 'assistant',
-      content: `# Post-Interview
-
-1. Transcribe and Analyze:
-   • Transcribe the interview recordings if necessary.
-   • Identify key themes, patterns, and insights from the responses.
-
-2. Share Findings:
-   • Compile findings into a report or presentation.
-   • Highlight actionable insights and recommendations for the design and product teams.
-
-3. Follow Up:
-   • Send a thank-you note to participants.
-   • Provide any promised incentives or rewards.
-   • Share any high-level findings or updates with participants, if appropriate.
-
-# Tips for Effective Interviews
-
-• **Active Listening:** Pay close attention to participants' responses and show genuine interest.
-• **Neutral Stance:** Avoid leading questions or expressing your own opinions.
-• **Adaptability:** Be prepared to adjust the interview flow based on participants' responses.
-• **Empathy:** Understand and respect participants' perspectives and experiences.
-• **Documentation:** Take thorough notes and record important observations during the interview.`
-    }
-  ]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -42,6 +19,15 @@ function App() {
     email: '',
     password: ''
   });
+  const [streamedResponse, setStreamedResponse] = useState('');
+
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (currentScreen === 'results' && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, streamedResponse, currentScreen]);
 
   const navigateToQuery = () => {
     setCurrentScreen('query');
@@ -57,29 +43,34 @@ function App() {
     }
   };
 
-  const handleQuerySubmit = (e: React.FormEvent) => {
+  const handleQuerySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentScreen === 'results' && query.trim()) {
-      // Add user message
-      setChatMessages(prev => [...prev, { type: 'user', content: query.trim() }]);
-      
-      // Clear query immediately
-      setQuery('');
-      
-      // Simulate AI response (replace with actual AI integration)
-      setTimeout(() => {
-        const responses = [
-          "Based on your uploaded documents, here are the key insights I found regarding your query. The analysis shows several important patterns that align with your research objectives.",
-          "I've analyzed your knowledge base and found relevant information about this topic. Here's what I discovered from the connected data sources and uploaded files.",
-          "From the documents in your knowledge base, I can provide the following analysis:\n\n• Key finding 1: Relevant data point from your documents\n• Key finding 2: Cross-referenced information\n• Key finding 3: Actionable insights based on your query",
-          "Let me search through your uploaded content to provide you with accurate information. The results indicate several relevant matches to your question.",
-          "Based on the data sources you've connected, here's what I found relevant to your question:\n\n**Summary:** Your query relates to multiple documents in your knowledge base.\n\n**Key Points:**\n• Primary insight from document analysis\n• Secondary findings from cross-referencing\n• Recommendations based on the data"
-        ];
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        setChatMessages(prev => [...prev, { type: 'assistant', content: randomResponse }]);
-      }, 1000);
-    } else if (currentScreen !== 'results') {
-      navigateToResults();
+    const userQuery = query.trim();
+    if (!userQuery) return;
+    setQuery('');
+    setStreamedResponse('');
+    // Always navigate to results and send message in one step
+    if (currentScreen !== 'results') {
+      setCurrentScreen('results');
+      setTimeout(async () => {
+        setChatMessages(prev => [...prev, { type: 'user', content: userQuery }]);
+        let streamingActive = true;
+        const aiMessage = await sendMessage(userQuery, chatMessages, (chunk) => {
+          if (streamingActive) setStreamedResponse(prev => prev + chunk);
+        });
+        streamingActive = false;
+        setStreamedResponse(''); // Clear streaming UI
+        setChatMessages(prev => [...prev, aiMessage]);
+      }, 0);
+    } else {
+      setChatMessages(prev => [...prev, { type: 'user', content: userQuery }]);
+      let streamingActive = true;
+      const aiMessage = await sendMessage(userQuery, chatMessages, (chunk) => {
+        if (streamingActive) setStreamedResponse(prev => prev + chunk);
+      });
+      streamingActive = false;
+      setStreamedResponse(''); // Clear streaming UI
+      setChatMessages(prev => [...prev, aiMessage]);
     }
   };
 
@@ -134,14 +125,16 @@ function App() {
     return !errors.email && !errors.password;
   };
 
-  const handleEmailFormSubmit = (e: React.FormEvent) => {
+  const handleEmailFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateEmailForm()) {
+      // Call login from authService
+      await login({ email: emailFormData.email, password: emailFormData.password });
       // Successful validation - navigate to query screen
       setCurrentScreen('query');
       setShowEmailForm(false);
-      setEmailFormData({ username: '', email: '', password: '' });
-      setEmailFormErrors({ username: '', email: '', password: '' });
+      setEmailFormData({ email: '', password: '' });
+      setEmailFormErrors({ email: '', password: '' });
     }
   };
 
@@ -155,8 +148,8 @@ function App() {
 
   const handleBackToLogin = () => {
     setShowEmailForm(false);
-    setEmailFormData({ username: '', email: '', password: '' });
-    setEmailFormErrors({ username: '', email: '', password: '' });
+    setEmailFormData({ email: '', password: '' });
+    setEmailFormErrors({ email: '', password: '' });
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,53 +180,9 @@ function App() {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
+  // Replace formatMessageContent with markdown rendering
   const formatMessageContent = (content: string) => {
-    // Split content by lines and format
-    const lines = content.split('\n');
-    const formattedLines = lines.map((line, index) => {
-      // Handle headers
-      if (line.startsWith('# ')) {
-        return <h1 key={index} className="text-lg font-semibold mb-5 text-[#F0F0F0]">{line.substring(2)}</h1>;
-      }
-      
-      // Handle numbered lists
-      if (/^\d+\./.test(line.trim())) {
-        return <li key={index} className="mb-4 text-sm text-gray-300">{line.trim()}</li>;
-      }
-      
-      // Handle bullet points with bold text
-      if (line.trim().startsWith('• **') && line.includes(':**')) {
-        const match = line.match(/• \*\*(.*?)\*\*:(.*)/);
-        if (match) {
-          return (
-            <li key={index} className="relative pl-4 mb-4 text-sm text-gray-400">
-              <span className="absolute left-0 text-[#F0F0F0]">•</span>
-              <strong className="text-gray-300">{match[1]}:</strong>{match[2]}
-            </li>
-          );
-        }
-      }
-      
-      // Handle regular bullet points
-      if (line.trim().startsWith('• ')) {
-        return (
-          <li key={index} className="relative pl-4 mt-2 text-sm text-gray-400">
-            <span className="absolute left-0 text-[#F0F0F0]">•</span>
-            {line.substring(2)}
-          </li>
-        );
-      }
-      
-      // Handle empty lines
-      if (line.trim() === '') {
-        return <br key={index} />;
-      }
-      
-      // Handle regular paragraphs
-      return <p key={index} className="text-sm text-gray-300 mb-2">{line}</p>;
-    });
-    
-    return <div>{formattedLines}</div>;
+    return <ReactMarkdown>{content}</ReactMarkdown>;
   };
 
   // Sidebar component
@@ -370,6 +319,8 @@ function App() {
               </div>
 
               <form onSubmit={handleEmailFormSubmit} className="space-y-4">
+                {/* Username field removed */}
+
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                     Email
@@ -765,6 +716,16 @@ function App() {
                   )}
                 </div>
               ))}
+              {/* Streamed response UI: show only if not already in chatMessages */}
+              {streamedResponse && (!chatMessages.length || chatMessages[chatMessages.length-1].type !== 'assistant' || chatMessages[chatMessages.length-1].content !== streamedResponse) && (
+                <div className="flex justify-start">
+                  <div className="w-full text-white leading-relaxed bg-[#1A1A1A] rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2),0_0_80px_rgba(255,255,255,0.1)] p-10 border-2 border-blue-500 animate-pulse">
+                    {formatMessageContent(streamedResponse)}
+                    <div className="mt-4 text-xs text-blue-400">Streaming...</div>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
             </div>
           </main>
           
