@@ -1,24 +1,33 @@
-import React, { useState } from 'react';
-import { sendMessage, ChatMessage, initialAssistantMessage } from './chatService';
-import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, Key, File, Send, ChevronRight, Sparkles } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { sendMessage, ChatMessage } from './chatService';
+import { login } from './authService';
+import { Book, ArrowLeft, RotateCcw, Upload, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, File, Send, ChevronRight, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
   const [query, setQuery] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([initialAssistantMessage]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [emailFormData, setEmailFormData] = useState({
-    username: '',
     email: '',
     password: ''
   });
   const [emailFormErrors, setEmailFormErrors] = useState({
-    username: '',
     email: '',
     password: ''
   });
+  const [streamedResponse, setStreamedResponse] = useState('');
+
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (currentScreen === 'results' && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, streamedResponse, currentScreen]);
 
   const navigateToQuery = () => {
     setCurrentScreen('query');
@@ -36,16 +45,32 @@ function App() {
 
   const handleQuerySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentScreen === 'results' && query.trim()) {
-      // Add user message
-      setChatMessages(prev => [...prev, { type: 'user', content: query.trim() }]);
-      const userQuery = query.trim();
-      setQuery('');
-      // Get AI response from chatService
-      const aiMessage = await sendMessage(userQuery, chatMessages);
+    const userQuery = query.trim();
+    if (!userQuery) return;
+    setQuery('');
+    setStreamedResponse('');
+    // Always navigate to results and send message in one step
+    if (currentScreen !== 'results') {
+      setCurrentScreen('results');
+      setTimeout(async () => {
+        setChatMessages(prev => [...prev, { type: 'user', content: userQuery }]);
+        let streamingActive = true;
+        const aiMessage = await sendMessage(userQuery, chatMessages, (chunk) => {
+          if (streamingActive) setStreamedResponse(prev => prev + chunk);
+        });
+        streamingActive = false;
+        setStreamedResponse(''); // Clear streaming UI
+        setChatMessages(prev => [...prev, aiMessage]);
+      }, 0);
+    } else {
+      setChatMessages(prev => [...prev, { type: 'user', content: userQuery }]);
+      let streamingActive = true;
+      const aiMessage = await sendMessage(userQuery, chatMessages, (chunk) => {
+        if (streamingActive) setStreamedResponse(prev => prev + chunk);
+      });
+      streamingActive = false;
+      setStreamedResponse(''); // Clear streaming UI
       setChatMessages(prev => [...prev, aiMessage]);
-    } else if (currentScreen !== 'results') {
-      navigateToResults();
     }
   };
 
@@ -77,17 +102,9 @@ function App() {
 
   const validateEmailForm = () => {
     const errors = {
-      username: '',
       email: '',
       password: ''
     };
-
-    // Username validation
-    if (!emailFormData.username.trim()) {
-      errors.username = 'Username is required';
-    } else if (emailFormData.username.length < 3) {
-      errors.username = 'Username must be at least 3 characters';
-    }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -105,17 +122,19 @@ function App() {
     }
 
     setEmailFormErrors(errors);
-    return !errors.username && !errors.email && !errors.password;
+    return !errors.email && !errors.password;
   };
 
-  const handleEmailFormSubmit = (e: React.FormEvent) => {
+  const handleEmailFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateEmailForm()) {
+      // Call login from authService
+      await login({ email: emailFormData.email, password: emailFormData.password });
       // Successful validation - navigate to query screen
       setCurrentScreen('query');
       setShowEmailForm(false);
-      setEmailFormData({ username: '', email: '', password: '' });
-      setEmailFormErrors({ username: '', email: '', password: '' });
+      setEmailFormData({ email: '', password: '' });
+      setEmailFormErrors({ email: '', password: '' });
     }
   };
 
@@ -129,8 +148,8 @@ function App() {
 
   const handleBackToLogin = () => {
     setShowEmailForm(false);
-    setEmailFormData({ username: '', email: '', password: '' });
-    setEmailFormErrors({ username: '', email: '', password: '' });
+    setEmailFormData({ email: '', password: '' });
+    setEmailFormErrors({ email: '', password: '' });
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,53 +180,9 @@ function App() {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
+  // Replace formatMessageContent with markdown rendering
   const formatMessageContent = (content: string) => {
-    // Split content by lines and format
-    const lines = content.split('\n');
-    const formattedLines = lines.map((line, index) => {
-      // Handle headers
-      if (line.startsWith('# ')) {
-        return <h1 key={index} className="text-lg font-semibold mb-5 text-[#F0F0F0]">{line.substring(2)}</h1>;
-      }
-      
-      // Handle numbered lists
-      if (/^\d+\./.test(line.trim())) {
-        return <li key={index} className="mb-4 text-sm text-gray-300">{line.trim()}</li>;
-      }
-      
-      // Handle bullet points with bold text
-      if (line.trim().startsWith('• **') && line.includes(':**')) {
-        const match = line.match(/• \*\*(.*?)\*\*:(.*)/);
-        if (match) {
-          return (
-            <li key={index} className="relative pl-4 mb-4 text-sm text-gray-400">
-              <span className="absolute left-0 text-[#F0F0F0]">•</span>
-              <strong className="text-gray-300">{match[1]}:</strong>{match[2]}
-            </li>
-          );
-        }
-      }
-      
-      // Handle regular bullet points
-      if (line.trim().startsWith('• ')) {
-        return (
-          <li key={index} className="relative pl-4 mt-2 text-sm text-gray-400">
-            <span className="absolute left-0 text-[#F0F0F0]">•</span>
-            {line.substring(2)}
-          </li>
-        );
-      }
-      
-      // Handle empty lines
-      if (line.trim() === '') {
-        return <br key={index} />;
-      }
-      
-      // Handle regular paragraphs
-      return <p key={index} className="text-sm text-gray-300 mb-2">{line}</p>;
-    });
-    
-    return <div>{formattedLines}</div>;
+    return <ReactMarkdown>{content}</ReactMarkdown>;
   };
 
   // Sidebar component
@@ -344,26 +319,7 @@ function App() {
               </div>
 
               <form onSubmit={handleEmailFormSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    value={emailFormData.username}
-                    onChange={(e) => handleInputChange('username', e.target.value)}
-                    className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${
-                      emailFormErrors.username 
-                        ? 'border-red-500 focus:ring-red-500' 
-                        : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'
-                    }`}
-                    placeholder="Enter your username"
-                  />
-                  {emailFormErrors.username && (
-                    <p className="mt-1 text-sm text-red-400">{emailFormErrors.username}</p>
-                  )}
-                </div>
+                {/* Username field removed */}
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
@@ -760,6 +716,16 @@ function App() {
                   )}
                 </div>
               ))}
+              {/* Streamed response UI: show only if not already in chatMessages */}
+              {streamedResponse && (!chatMessages.length || chatMessages[chatMessages.length-1].type !== 'assistant' || chatMessages[chatMessages.length-1].content !== streamedResponse) && (
+                <div className="flex justify-start">
+                  <div className="w-full text-white leading-relaxed bg-[#1A1A1A] rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2),0_0_80px_rgba(255,255,255,0.1)] p-10 border-2 border-blue-500 animate-pulse">
+                    {formatMessageContent(streamedResponse)}
+                    <div className="mt-4 text-xs text-blue-400">Streaming...</div>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
             </div>
           </main>
           
