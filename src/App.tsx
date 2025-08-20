@@ -188,9 +188,17 @@ function App() {
   // Sidebar component
   const Sidebar = () => (
     <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#0D0D0D] flex flex-col p-4 border-r border-gray-800 transition-all duration-300 fixed left-0 top-0 h-screen z-10`}>
-      <div className="flex items-center gap-2.5 p-2 mb-6">
-        <Sparkles className="w-7 h-7 text-gray-200 flex-shrink-0" />
-        {!sidebarCollapsed && <h1 className="text-xl font-bold text-gray-100">DocHuman</h1>}
+      <div className="flex items-center justify-between p-2 mb-6">
+        <div className="flex items-center gap-2.5">
+          <Sparkles className="w-7 h-7 text-gray-200 flex-shrink-0" />
+          {!sidebarCollapsed && <h1 className="text-xl font-bold text-gray-100">DocHuman</h1>}
+        </div>
+        <button 
+          onClick={toggleSidebar}
+          className="text-gray-400 hover:text-gray-200 transition-colors p-1"
+        >
+          <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${sidebarCollapsed ? '' : 'rotate-180'}`} />
+        </button>
       </div>
 
       <button className={`w-full text-left flex items-center gap-3 px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-sm font-medium text-gray-100 hover:bg-gray-800 transition-colors mb-6 ${sidebarCollapsed ? 'justify-center' : ''}`}>
