@@ -213,12 +213,7 @@ function App() {
         </span>
         
         <div>
-          <button 
-            onClick={navigateToDataSources}
-            className={`w-full flex ${sidebarCollapsed ? 'justify-center' : 'justify-between'} items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''} ${
-              currentScreen === 'datasources' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:bg-gray-900 hover:text-gray-100'
-            } transition-colors`}
-          >
+          <button className={`w-full flex ${sidebarCollapsed ? 'justify-center' : 'justify-between'} items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors`}>
             <div className="flex items-center gap-3">
               <Link className="w-5 h-5 flex-shrink-0" />
               {!sidebarCollapsed && <span>Data Sources</span>}
@@ -394,6 +389,158 @@ function App() {
               </div>
             </>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  if (currentScreen === 'datasources') {
+    return (
+      <div className="bg-black text-white font-sans min-h-screen">
+        <Sidebar />
+        <div className={`flex flex-col h-screen ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 p-6`}>
+          <header className="w-full flex justify-between items-center mb-8">
+            <div>
+              <button 
+                onClick={navigateToQuery}
+                className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
+            </div>
+            <div className="flex items-center space-x-2 text-lg font-medium text-gray-200">
+              <Sparkles className="w-[18px] h-[18px] text-gray-400" />
+              <span>DocHuman</span>
+            </div>
+            <div className="w-[88px]"></div>
+          </header>
+
+          <main className="flex-1 flex flex-col items-center justify-center -mt-10">
+            <div className="w-full max-w-4xl mx-auto">
+              
+              <header className="text-center mb-12">
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Connect Data Sources</h2>
+                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                  Connect your favorite tools and platforms to create a unified knowledge base.
+                </p>
+              </header>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                
+                {/* Notion */}
+                <div className="bg-gray-900/50 border border-gray-700 rounded-2xl p-8 text-center hover:bg-gray-900/70 hover:border-gray-600 transition-all cursor-pointer group">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 4h16v16H4V4z" fill="#000"/>
+                        <path d="M8 8h8v1H8V8zm0 3h8v1H8v-1zm0 3h5v1H8v-1z" fill="#fff"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Notion</h3>
+                  <p className="text-sm text-gray-400 mb-4">Connect your Notion workspace and pages</p>
+                  <button className="w-full bg-white text-black font-medium py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    Connect
+                  </button>
+                </div>
+
+                {/* Google Drive */}
+                <div className="bg-gray-900/50 border border-gray-700 rounded-2xl p-8 text-center hover:bg-gray-900/70 hover:border-gray-600 transition-all cursor-pointer group">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6.5 2L12 8.5L17.5 2L21 8.5L12 22L3 8.5L6.5 2Z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Google Drive</h3>
+                  <p className="text-sm text-gray-400 mb-4">Import documents from Google Drive</p>
+                  <button className="w-full bg-white text-black font-medium py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    Connect
+                  </button>
+                </div>
+
+                {/* SharePoint */}
+                <div className="bg-gray-900/50 border border-gray-700 rounded-2xl p-8 text-center hover:bg-gray-900/70 hover:border-gray-600 transition-all cursor-pointer group">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2 4h20v16H2V4zm2 2v12h16V6H4zm2 2h12v2H6V8zm0 4h12v2H6v-2zm0 4h8v2H6v-2z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">SharePoint</h3>
+                  <p className="text-sm text-gray-400 mb-4">Connect to SharePoint document libraries</p>
+                  <button className="w-full bg-white text-black font-medium py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    Connect
+                  </button>
+                </div>
+
+                {/* Confluence */}
+                <div className="bg-gray-900/50 border border-gray-700 rounded-2xl p-8 text-center hover:bg-gray-900/70 hover:border-gray-600 transition-all cursor-pointer group">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Confluence</h3>
+                  <p className="text-sm text-gray-400 mb-4">Import pages from Confluence spaces</p>
+                  <button className="w-full bg-white text-black font-medium py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    Connect
+                  </button>
+                </div>
+
+                {/* Gmail */}
+                <div className="bg-gray-900/50 border border-gray-700 rounded-2xl p-8 text-center hover:bg-gray-900/70 hover:border-gray-600 transition-all cursor-pointer group">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 bg-red-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Gmail</h3>
+                  <p className="text-sm text-gray-400 mb-4">Connect Gmail for email content analysis</p>
+                  <button className="w-full bg-white text-black font-medium py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    Connect
+                  </button>
+                </div>
+
+                {/* Slack */}
+                <div className="bg-gray-900/50 border border-gray-700 rounded-2xl p-8 text-center hover:bg-gray-900/70 hover:border-gray-600 transition-all cursor-pointer group">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52-2.523c0-1.393 1.135-2.528 2.52-2.528h2.52v2.528c0 1.388-1.127 2.523-2.52 2.523zm0-6.33H2.522c-1.393 0-2.522-1.135-2.522-2.528S1.129 3.78 2.522 3.78h2.52c1.385 0 2.52 1.135 2.52 2.527s-1.135 2.528-2.52 2.528z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Slack</h3>
+                  <p className="text-sm text-gray-400 mb-4">Import conversations and files from Slack</p>
+                  <button className="w-full bg-white text-black font-medium py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    Connect
+                  </button>
+                </div>
+
+              </div>
+
+              {/* Connected Sources Section */}
+              <div className="mt-16">
+                <h3 className="text-2xl font-semibold text-white mb-6 text-center">Connected Sources</h3>
+                <div className="bg-gray-900/30 border border-gray-700 rounded-2xl p-8 text-center">
+                  <div className="text-gray-400 mb-4">
+                    <Link className="w-12 h-12 mx-auto mb-4" />
+                  </div>
+                  <p className="text-gray-400">No data sources connected yet</p>
+                  <p className="text-sm text-gray-500 mt-2">Connect your first data source to get started</p>
+                </div>
+              </div>
+
+            </div>
+          </main>
         </div>
       </div>
     );
