@@ -519,82 +519,204 @@ function App() {
               <div className="w-full max-w-2xl mx-auto">
                 <div className="flex justify-center mb-6">
                   <div className="flex items-center bg-gray-900 p-1 rounded-lg">
-                    <button className="px-6 py-2 text-sm font-semibold text-white bg-gray-800 rounded-md flex items-center gap-2">
+                    <button 
+                      onClick={() => setUploadView('upload')}
+                      className={`px-6 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors ${
+                        uploadView === 'upload' 
+                          ? 'text-white bg-gray-800' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
                       <File className="w-4 h-4" />
                       File
                     </button>
-                    <button className="px-6 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors rounded-md flex items-center gap-2">
-                      <Link className="w-4 h-4" />
-                      Connect Source
+                    <button 
+                      onClick={() => setUploadView('allFiles')}
+                      className={`px-6 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors ${
+                        uploadView === 'allFiles' 
+                          ? 'text-white bg-gray-800' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <FileText className="w-4 h-4" />
+                      All Files
                     </button>
                   </div>
                 </div>
 
-                <div className="bg-gray-900/50 border-2 border-dashed border-gray-700 rounded-2xl p-8 text-center">
-                  <div className="flex justify-center mb-4">
-                    <div className="relative">
-                      {/* Document icons illustration */}
-                      <div className="flex items-center justify-center space-x-2 transform -rotate-12">
-                        <div className="bg-blue-500 p-3 rounded-lg shadow-lg transform rotate-12">
-                          <FileText className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="bg-red-500 p-3 rounded-lg shadow-lg transform -rotate-6">
-                          <File className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="bg-orange-500 p-3 rounded-lg shadow-lg transform rotate-6">
-                          <FileText className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Upload file(s) to your Knowledge Base</h3>
-                  <p className="text-xs text-gray-500 mb-6 font-mono">[ .PDF, .CSV, .TXT, .epub, .docx, .xls, .PNG, .JPEG ]</p>
-                  <button 
-                    onClick={handleUploadButtonClick}
-                    className="bg-green-400 text-black font-bold py-3 px-6 rounded-lg hover:bg-green-300 transition-all flex items-center gap-2 mx-auto"
-                  >
-                    <Upload className="w-4 h-4" />
-                    Upload file
-                  </button>
-                </div>
-
-                {/* Selected Files Display */}
-                {selectedFiles.length > 0 && (
-                  <div className="mt-6 bg-gray-900/30 rounded-xl p-6">
-                    <h4 className="text-lg font-semibold text-white mb-4">Selected Files ({selectedFiles.length})</h4>
-                    <div className="space-y-3">
-                      {selectedFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                              <FileText className="w-5 h-5 text-white" />
+                {uploadView === 'upload' ? (
+                  <>
+                    <div className="bg-gray-900/50 border-2 border-dashed border-gray-700 rounded-2xl p-8 text-center">
+                      <div className="flex justify-center mb-4">
+                        <div className="relative">
+                          {/* Document icons illustration */}
+                          <div className="flex items-center justify-center space-x-2 transform -rotate-12">
+                            <div className="bg-blue-500 p-3 rounded-lg shadow-lg transform rotate-12">
+                              <FileText className="w-8 h-8 text-white" />
                             </div>
-                            <div>
-                              <p className="text-white font-medium text-sm">{file.name}</p>
-                              <p className="text-gray-400 text-xs">{formatFileSize(file.size)}</p>
+                            <div className="bg-red-500 p-3 rounded-lg shadow-lg transform -rotate-6">
+                              <File className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="bg-orange-500 p-3 rounded-lg shadow-lg transform rotate-6">
+                              <FileText className="w-8 h-8 text-white" />
                             </div>
                           </div>
-                          <button
-                            onClick={() => removeFile(index)}
-                            className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Upload file(s) to your Knowledge Base</h3>
+                      <p className="text-xs text-gray-500 mb-6 font-mono">[ .PDF, .CSV, .TXT, .epub, .docx, .xls, .PNG, .JPEG ]</p>
+                      <button 
+                        onClick={handleUploadButtonClick}
+                        className="bg-green-400 text-black font-bold py-3 px-6 rounded-lg hover:bg-green-300 transition-all flex items-center gap-2 mx-auto"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Upload file
+                      </button>
+                    </div>
+
+                    {/* Selected Files Display */}
+                    {selectedFiles.length > 0 && (
+                      <div className="mt-6 bg-gray-900/30 rounded-xl p-6">
+                        <h4 className="text-lg font-semibold text-white mb-4">Selected Files ({selectedFiles.length})</h4>
+                        <div className="space-y-3">
+                          {selectedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                                  <FileText className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                  <p className="text-white font-medium text-sm">{file.name}</p>
+                                  <p className="text-gray-400 text-xs">{formatFileSize(file.size)}</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => removeFile(index)}
+                                className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 flex gap-3">
+                          <button className="bg-green-400 text-black font-bold py-2 px-4 rounded-lg hover:bg-green-300 transition-all text-sm">
+                            Process Files
+                          </button>
+                          <button 
+                            onClick={() => setSelectedFiles([])}
+                            className="bg-gray-700 text-white font-medium py-2 px-4 rounded-lg hover:bg-gray-600 transition-all text-sm"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            Clear All
                           </button>
                         </div>
-                      ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Search Bar */}
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Search files..."
+                      />
                     </div>
-                    <div className="mt-4 flex gap-3">
-                      <button className="bg-green-400 text-black font-bold py-2 px-4 rounded-lg hover:bg-green-300 transition-all text-sm">
-                        Process Files
-                      </button>
-                      <button 
-                        onClick={() => setSelectedFiles([])}
-                        className="bg-gray-700 text-white font-medium py-2 px-4 rounded-lg hover:bg-gray-600 transition-all text-sm"
-                      >
-                        Clear All
-                      </button>
+
+                    {/* Recently Accessed Files */}
+                    <div className="bg-gray-900/30 rounded-xl p-6">
+                      <h4 className="text-lg font-semibold text-white mb-4">Recently Accessed</h4>
+                      <div className="space-y-3">
+                        {recentlyAccessedFiles.map((file) => (
+                          <div key={file.id} className="flex items-center justify-between bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/70 transition-colors cursor-pointer">
+                            <div className="flex items-center gap-3">
+                              {getFileIcon(file.type)}
+                              <div>
+                                <p className="text-white font-medium">{file.name}</p>
+                                <p className="text-gray-400 text-sm">{file.size} • {file.created}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                file.status === 'Processed' 
+                                  ? 'bg-green-500/20 text-green-400' 
+                                  : 'bg-yellow-500/20 text-yellow-400'
+                              }`}>
+                                {file.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* All Files */}
+                    <div className="bg-gray-900/30 rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-lg font-semibold text-white">All Files ({filteredFiles.length})</h4>
+                        <button 
+                          onClick={handleUploadButtonClick}
+                          className="bg-green-400 text-black font-bold py-2 px-4 rounded-lg hover:bg-green-300 transition-all text-sm flex items-center gap-2"
+                        >
+                          <Upload className="w-4 h-4" />
+                          Upload New
+                        </button>
+                      </div>
+                      
+                      {filteredFiles.length === 0 ? (
+                        <div className="text-center py-8">
+                          <FileText className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+                          <p className="text-gray-400">
+                            {searchQuery ? 'No files match your search.' : 'No files uploaded yet.'}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {filteredFiles.map((file) => (
+                            <div key={file.id} className="flex items-center justify-between bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/70 transition-colors cursor-pointer">
+                              <div className="flex items-center gap-3">
+                                {getFileIcon(file.type)}
+                                <div>
+                                  <p className="text-white font-medium">{file.name}</p>
+                                  <p className="text-gray-400 text-sm">{file.size} • {file.created}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  file.status === 'Processed' 
+                                    ? 'bg-green-500/20 text-green-400' 
+                                    : 'bg-yellow-500/20 text-yellow-400'
+                                }`}>
+                                  {file.status}
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  <button className="p-2 text-gray-400 hover:text-blue-400 transition-colors">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                  </button>
+                                  <button className="p-2 text-gray-400 hover:text-red-400 transition-colors">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
