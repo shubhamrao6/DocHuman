@@ -737,174 +737,11 @@ function App() {
     );
   }
 
-  return (
-    <div className="bg-black text-white font-sans min-h-screen flex">
-      <Sidebar />
-      <div className="flex-1 flex flex-col p-6">
-        <header className="w-full flex justify-between items-center">
-          <div>
-            <button 
-              onClick={navigateToLanding}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </button>
-          </div>
-          <div className="flex items-center space-x-2 text-lg font-medium text-gray-200">
-            <ChevronRight className="w-[18px] h-[18px] text-gray-400" />
-            <span>DocHuman</span>
-          </div>
-          <div className="w-[88px]"></div>
-        </header>
-
-        <main className="flex-grow flex flex-col items-center justify-center -mt-10">
-          <div className="w-full max-w-2xl flex flex-col items-center text-center">
-            <h1 className="text-4xl font-normal text-white mb-3">Ask DocHuman</h1>
-            <p className="text-base text-gray-400 mb-12">Ask questions about your knowledge base and get intelligent answers.</p>
-            
-            <form onSubmit={handleQuerySubmit} className="w-full relative mb-8">
-              <div className="relative">
-                <input 
-                  type="text" 
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="What would you like to create today?" 
-                  className="w-full h-12 px-4 pr-12 bg-[#1A1A1A] border border-gray-700 rounded-lg focus:ring-1 focus:ring-gray-500 focus:border-gray-500 focus:outline-none placeholder-gray-500 text-base text-white"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white transition-colors"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </form>
-
-            <div className="w-full flex flex-col items-center">
-              <p className="text-sm text-gray-400 mb-4 self-start">Try these out...</p>
-              <div className="flex flex-wrap justify-center gap-3">
-                <button 
-                  onClick={() => handleSuggestionClick('Series A pitch deck')}
-                  className="px-4 py-2 bg-[#2A2A2A] border border-gray-600 rounded-md text-sm text-gray-200 hover:bg-gray-600 transition-colors"
-                >
-                  Series A pitch deck
-                </button>
-                <button 
-                  onClick={() => handleSuggestionClick('User research findings')}
-                  className="px-4 py-2 bg-[#2A2A2A] border border-gray-600 rounded-md text-sm text-gray-200 hover:bg-gray-600 transition-colors"
-                >
-                  User research findings
-                </button>
-                <button 
-                  onClick={() => handleSuggestionClick('Digital marketing trends report')}
-                  className="px-4 py-2 bg-[#2A2A2A] border border-gray-600 rounded-md text-sm text-gray-200 hover:bg-gray-600 transition-colors"
-                >
-                  Digital marketing trends report
-                </button>
-                <button 
-                  onClick={() => handleSuggestionClick('Quarterly planning proposal')}
-                  className="px-4 py-2 bg-[#2A2A2A] border border-gray-600 rounded-md text-sm text-gray-200 hover:bg-gray-600 transition-colors"
-                >
-                  Quarterly planning proposal
-                </button>
-              </div>
-            </div>
-          </div>
-        </main>
-
-      </div>
-    </div>
-  );
-}
-
-export default App;
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  file.status === 'Processed' 
-                                    ? 'bg-green-500/20 text-green-400' 
-                                    : 'bg-yellow-500/20 text-yellow-400'
-                                }`}>
-                                  {file.status}
-                                </span>
-                                <div className="flex items-center gap-1">
-                                  <button className="p-2 text-gray-400 hover:text-blue-400 transition-colors">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                  </button>
-                                  <button className="p-2 text-gray-400 hover:text-red-400 transition-colors">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-            </div>
-          </main>
-        </div>
-      </div>
-    );
-  }
-
-  if (currentScreen === 'landing') {
-    return (
-      <div className="bg-black min-h-screen">
-        <main className="min-h-screen flex flex-col items-center justify-center text-white px-4 relative">
-          
-          <header className="w-full flex justify-between items-center py-6 absolute top-0 px-8">
-            <div className="flex items-center space-x-3 text-base text-white/80 font-medium">
-              <Sparkles className="w-[15px] h-[15px] text-gray-400" />
-              <span>DocHuman</span>
-            </div>
-            <button 
-              onClick={navigateToLogin}
-              className="text-white/80 hover:text-white transition-colors font-medium"
-            >
-              Login
-            </button>
-          </header>
-
-          <div className="flex flex-col items-center text-center max-w-2xl">
-            <div className="flex flex-col items-start text-left max-w-2xl">
-              <div className="space-y-8 text-left">
-                <p className="text-[28px] leading-relaxed text-white/80">
-                  Transform scattered documents into a unified, intelligent knowledge base.
-                </p>
-                <p className="text-[28px] leading-relaxed text-white/50">
-                  Every query returns results with impact.
-                </p>
-              </div>
-              <div className="mt-16 self-start">
-                <button 
-                  onClick={navigateToQuery}
-                  className="bg-white/90 text-black px-8 py-3 rounded-lg text-base font-medium hover:bg-white hover:scale-105 hover:shadow-lg transition-all duration-300 active:scale-95"
-                >
-                  Continue
-                </button>
-              </div>
-            </div>
-          </div>
-
-        </main>
-      </div>
-    );
-  }
-
   if (currentScreen === 'results') {
     return (
       <div className="bg-black text-white font-sans min-h-screen flex">
         <Sidebar />
-        <div className="flex-1 flex flex-col p-6">
+        <div className={`flex-1 flex flex-col p-6 ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300`}>
           <header className="w-full flex justify-between items-center mb-8">
             <div>
               <button 
@@ -1065,10 +902,54 @@ export default App;
     );
   }
 
+  if (currentScreen === 'landing') {
+    return (
+      <div className="bg-black min-h-screen">
+        <main className="min-h-screen flex flex-col items-center justify-center text-white px-4 relative">
+          
+          <header className="w-full flex justify-between items-center py-6 absolute top-0 px-8">
+            <div className="flex items-center space-x-3 text-base text-white/80 font-medium">
+              <Sparkles className="w-[15px] h-[15px] text-gray-400" />
+              <span>DocHuman</span>
+            </div>
+            <button 
+              onClick={navigateToLogin}
+              className="text-white/80 hover:text-white transition-colors font-medium"
+            >
+              Login
+            </button>
+          </header>
+
+          <div className="flex flex-col items-center text-center max-w-2xl">
+            <div className="flex flex-col items-start text-left max-w-2xl">
+              <div className="space-y-8 text-left">
+                <p className="text-[28px] leading-relaxed text-white/80">
+                  Transform scattered documents into a unified, intelligent knowledge base.
+                </p>
+                <p className="text-[28px] leading-relaxed text-white/50">
+                  Every query returns results with impact.
+                </p>
+              </div>
+              <div className="mt-16 self-start">
+                <button 
+                  onClick={navigateToQuery}
+                  className="bg-white/90 text-black px-8 py-3 rounded-lg text-base font-medium hover:bg-white hover:scale-105 hover:shadow-lg transition-all duration-300 active:scale-95"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black text-white font-sans min-h-screen flex">
       <Sidebar />
-      <div className="flex-1 flex flex-col p-6">
+      <div className={`flex-1 flex flex-col p-6 ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300`}>
         <header className="w-full flex justify-between items-center">
           <div>
             <button 
