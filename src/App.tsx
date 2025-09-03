@@ -662,7 +662,7 @@ function App() {
 
                     {/* All Files */}
                     <div className="bg-gray-900/30 rounded-xl p-6">
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center justify-between mb-6">
                         <h4 className="text-lg font-semibold text-white">All Files ({filteredFiles.length})</h4>
                         <button 
                           onClick={handleUploadButtonClick}
@@ -673,25 +673,152 @@ function App() {
                         </button>
                       </div>
                       
+                      {/* Table Header */}
+                      <div className="grid grid-cols-12 gap-4 px-4 py-2 text-gray-400 text-sm font-medium border-b border-gray-700 mb-2">
+                        <div className="col-span-5">Name</div>
+                        <div className="col-span-2">Status</div>
+                        <div className="col-span-2">Created</div>
+                        <div className="col-span-3">Actions</div>
+                      </div>
+
                       {filteredFiles.length === 0 ? (
-                        <div className="text-center py-8">
+                        <div className="text-center py-12">
                           <FileText className="w-12 h-12 text-gray-500 mx-auto mb-3" />
                           <p className="text-gray-400">
                             {searchQuery ? 'No files match your search.' : 'No files uploaded yet.'}
                           </p>
                         </div>
                       ) : (
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                           {filteredFiles.map((file) => (
-                            <div key={file.id} className="flex items-center justify-between bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/70 transition-colors cursor-pointer">
-                              <div className="flex items-center gap-3">
+                            <div key={file.id} className="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-gray-800/30 transition-colors border-b border-gray-800/50">
+                              <div className="col-span-5 flex items-center gap-3">
                                 {getFileIcon(file.type)}
-                                <div>
-                                  <p className="text-white font-medium">{file.name}</p>
-                                  <p className="text-gray-400 text-sm">{file.size} • {file.created}</p>
-                                </div>
+                                <span className="text-white font-medium text-sm truncate">{file.name}</span>
                               </div>
-                              <div className="flex items-center gap-3">
+                              <div className="col-span-2 flex items-center gap-2">
+                                {file.status === 'Processed' ? (
+                                  <>
+                                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                    <span className="text-green-400 text-sm">Complete</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                                    <span className="text-yellow-400 text-sm">Processing</span>
+                                  </>
+                                )}
+                              </div>
+                              <div className="col-span-2 text-gray-400 text-sm">{file.created}</div>
+                              <div className="col-span-3 flex items-center gap-2">
+                                <button className="bg-gray-700 hover:bg-gray-600 text-white text-xs font-medium py-1 px-3 rounded-md transition-colors">
+                                  Open
+                                </button>
+                                <button className="bg-gray-700 hover:bg-gray-600 text-white text-xs font-medium py-1 px-3 rounded-md transition-colors">
+                                  Share
+                                </button>
+                                <button className="text-red-400 hover:text-red-300 text-xs font-medium py-1 px-3 rounded-md transition-colors">
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-black text-white font-sans min-h-screen flex">
+      <Sidebar />
+      <div className="flex-1 flex flex-col p-6">
+        <header className="w-full flex justify-between items-center">
+          <div>
+            <button 
+              onClick={navigateToLanding}
+              className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </button>
+          </div>
+          <div className="flex items-center space-x-2 text-lg font-medium text-gray-200">
+            <ChevronRight className="w-[18px] h-[18px] text-gray-400" />
+            <span>DocHuman</span>
+          </div>
+          <div className="w-[88px]"></div>
+        </header>
+
+        <main className="flex-grow flex flex-col items-center justify-center -mt-10">
+          <div className="w-full max-w-2xl flex flex-col items-center text-center">
+            <h1 className="text-4xl font-normal text-white mb-3">Ask DocHuman</h1>
+            <p className="text-base text-gray-400 mb-12">Ask questions about your knowledge base and get intelligent answers.</p>
+            
+            <form onSubmit={handleQuerySubmit} className="w-full relative mb-8">
+              <div className="relative">
+                <input 
+                  type="text" 
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="What would you like to create today?" 
+                  className="w-full h-12 px-4 pr-12 bg-[#1A1A1A] border border-gray-700 rounded-lg focus:ring-1 focus:ring-gray-500 focus:border-gray-500 focus:outline-none placeholder-gray-500 text-base text-white"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </form>
+
+            <div className="w-full flex flex-col items-center">
+              <p className="text-sm text-gray-400 mb-4 self-start">Try these out...</p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <button 
+                  onClick={() => handleSuggestionClick('Series A pitch deck')}
+                  className="px-4 py-2 bg-[#2A2A2A] border border-gray-600 rounded-md text-sm text-gray-200 hover:bg-gray-600 transition-colors"
+                >
+                  Series A pitch deck
+                </button>
+                <button 
+                  onClick={() => handleSuggestionClick('User research findings')}
+                  className="px-4 py-2 bg-[#2A2A2A] border border-gray-600 rounded-md text-sm text-gray-200 hover:bg-gray-600 transition-colors"
+                >
+                  User research findings
+                </button>
+                <button 
+                  onClick={() => handleSuggestionClick('Digital marketing trends report')}
+                  className="px-4 py-2 bg-[#2A2A2A] border border-gray-600 rounded-md text-sm text-gray-200 hover:bg-gray-600 transition-colors"
+                >
+                  Digital marketing trends report
+                </button>
+                <button 
+                  onClick={() => handleSuggestionClick('Quarterly planning proposal')}
+                  className="px-4 py-2 bg-[#2A2A2A] border border-gray-600 rounded-md text-sm text-gray-200 hover:bg-gray-600 transition-colors"
+                >
+                  Quarterly planning proposal
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+      </div>
+    </div>
+  );
+}
+
+export default App;
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                   file.status === 'Processed' 
                                     ? 'bg-green-500/20 text-green-400' 
