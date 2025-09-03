@@ -6,11 +6,13 @@ import ReactMarkdown from 'react-markdown';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
+  const [uploadView, setUploadView] = useState<'upload' | 'allFiles'>('upload');
   const [query, setQuery] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [emailFormData, setEmailFormData] = useState({
     email: '',
     password: ''
@@ -180,6 +182,81 @@ function App() {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
+
+  // Mock data for all files view
+  const allFiles = [
+    {
+      id: '1',
+      name: 'Project Requirements.pdf',
+      type: 'PDF',
+      size: '2.4 MB',
+      status: 'Processed',
+      created: '2 hours ago',
+      lastAccessed: new Date(Date.now() - 2 * 60 * 60 * 1000)
+    },
+    {
+      id: '2',
+      name: 'Marketing Strategy.docx',
+      type: 'DOCX',
+      size: '1.8 MB',
+      status: 'Processed',
+      created: '1 day ago',
+      lastAccessed: new Date(Date.now() - 4 * 60 * 60 * 1000)
+    },
+    {
+      id: '3',
+      name: 'User Research Data.csv',
+      type: 'CSV',
+      size: '856 KB',
+      status: 'Processing',
+      created: '3 days ago',
+      lastAccessed: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+    },
+    {
+      id: '4',
+      name: 'Technical Specifications.txt',
+      type: 'TXT',
+      size: '124 KB',
+      status: 'Processed',
+      created: '1 week ago',
+      lastAccessed: new Date(Date.now() - 30 * 60 * 1000)
+    },
+    {
+      id: '5',
+      name: 'Financial Report Q3.xlsx',
+      type: 'XLSX',
+      size: '3.2 MB',
+      status: 'Processed',
+      created: '2 weeks ago',
+      lastAccessed: new Date(Date.now() - 6 * 60 * 60 * 1000)
+    }
+  ];
+
+  const recentlyAccessedFiles = allFiles
+    .sort((a, b) => b.lastAccessed.getTime() - a.lastAccessed.getTime())
+    .slice(0, 3);
+
+  const filteredFiles = allFiles.filter(file =>
+    file.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case 'PDF':
+        return <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center text-white text-xs font-bold">PDF</div>;
+      case 'DOCX':
+        return <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center text-white text-xs font-bold">DOC</div>;
+      case 'CSV':
+        return <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white text-xs font-bold">CSV</div>;
+      case 'TXT':
+        return <div className="w-8 h-8 bg-gray-500 rounded flex items-center justify-center text-white text-xs font-bold">TXT</div>;
+      case 'XLSX':
+        return <div className="w-8 h-8 bg-emerald-500 rounded flex items-center justify-center text-white text-xs font-bold">XLS</div>;
+      default:
+        return <FileText className="w-8 h-8 text-gray-400" />;
+    }
+  };
+
   // Replace formatMessageContent with markdown rendering
   const formatMessageContent = (content: string) => {
     return <ReactMarkdown>{content}</ReactMarkdown>;
