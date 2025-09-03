@@ -305,8 +305,8 @@ function App() {
             currentScreen === 'uploads' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:bg-gray-900 hover:text-gray-100'
           } transition-colors`}
         >
-          <Upload className="w-5 h-5 flex-shrink-0" />
-          {!sidebarCollapsed && <span>Upload Files</span>}
+          <FileText className="w-5 h-5 flex-shrink-0" />
+          {!sidebarCollapsed && <span>Files</span>}
         </span>
         
         <span className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''}`}>
