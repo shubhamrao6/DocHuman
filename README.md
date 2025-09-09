@@ -12,6 +12,16 @@ DocHuman is a unified knowledge base application that transforms scattered docum
 - **Team Collaboration:** (UI placeholder for team features).
 - **API & Settings:** (UI placeholders for future integrations).
 
+## Architecture
+
+DocHuman follows a modular architecture for maintainability and scalability:
+
+### Component Structure
+- **Modular Components:** Each screen is a separate, reusable component
+- **Custom Hooks:** Business logic extracted into reusable hooks
+- **Service Layer:** API and WebSocket services organized in dedicated modules
+- **Utility Functions:** Common utilities for file handling and formatting
+
 ## Getting Started
 
 ### Prerequisites
@@ -75,10 +85,29 @@ yarn lint
 ```
 ├── public/                # Static assets
 ├── src/                   # Source code
+│   ├── components/        # Reusable UI components
+│   │   ├── LandingScreen.tsx
+│   │   ├── LoginScreen.tsx
+│   │   ├── QueryScreen.tsx
+│   │   ├── ResultsScreen.tsx
+│   │   ├── Sidebar.tsx
+│   │   └── UploadsScreen.tsx
+│   ├── hooks/             # Custom React hooks
+│   │   ├── useAuth.ts
+│   │   └── useFileHandling.ts
+│   ├── services/          # API and business logic
+│   │   ├── apiService.ts
+│   │   ├── authService.ts
+│   │   ├── chatService.ts
+│   │   ├── websocketService.ts
+│   │   └── index.ts
+│   ├── utils/             # Utility functions
+│   │   └── fileUtils.ts
+│   ├── data/              # Mock data and types
+│   │   └── mockData.ts
 │   ├── App.tsx            # Main application component
 │   ├── main.tsx           # Entry point
-│   ├── index.css          # Tailwind CSS setup
-│   └── ...                # Other source files
+│   └── index.css          # Tailwind CSS setup
 ├── index.html             # HTML template
 ├── package.json           # Project metadata and scripts
 ├── tailwind.config.js     # Tailwind CSS configuration
@@ -107,10 +136,24 @@ yarn lint
 
 ## Development
 
-- **Main UI:** See `src/App.tsx` for the core application logic and UI.
-- **Styling:** Tailwind CSS is used for rapid UI development. See `src/index.css` and `tailwind.config.js`.
-- **Configuration:** Vite and TypeScript configs are in the root directory.
-- **Linting:** ESLint is configured for code quality.
+### Modular Architecture
+- **Components:** Each screen is a separate component in `src/components/`
+- **Hooks:** Business logic extracted into custom hooks in `src/hooks/`
+- **Services:** API calls and WebSocket handling in `src/services/`
+- **Utils:** Common utilities in `src/utils/`
+- **Data:** Mock data and type definitions in `src/data/`
+
+### Key Files
+- **Main UI:** `src/App.tsx` - Clean routing and state management
+- **Styling:** Tailwind CSS in `src/index.css` and `tailwind.config.js`
+- **Configuration:** Vite and TypeScript configs in root directory
+- **Linting:** ESLint configured for code quality
+
+### Adding New Features
+1. Create components in `src/components/`
+2. Extract logic into hooks in `src/hooks/`
+3. Add API calls to `src/services/`
+4. Use utilities from `src/utils/`
 
 ## Contributing
 

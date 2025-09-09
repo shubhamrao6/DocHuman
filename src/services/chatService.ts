@@ -1,6 +1,3 @@
-// chatService.ts
-// Handles sending messages and simulating AI responses
-
 import { WebSocketService, WSMessage } from './websocketService';
 import { authResponse } from './authService';
 
@@ -13,7 +10,6 @@ const WS_URL = 'wss://jyukhbg024.execute-api.us-east-1.amazonaws.com/prod';
 const MODEL_ID = 'premium';
 const PROVIDER = 'azure';
 
-// Send message via WebSocket and stream response
 export function sendMessage(query: string, chatMessages: ChatMessage[], onStream: (chunk: string) => void): Promise<ChatMessage> {
   return new Promise((resolve, reject) => {
     if (!authResponse || !authResponse.idToken) {
@@ -27,7 +23,7 @@ export function sendMessage(query: string, chatMessages: ChatMessage[], onStream
         responseText = '';
       } else if (msg.type === 'chunk' && msg.text) {
         responseText += msg.text;
-        onStream(msg.text); // Stream chunk to UI
+        onStream(msg.text);
       } else if (msg.type === 'end') {
         wsService.disconnect();
         resolve({ type: 'assistant', content: responseText });

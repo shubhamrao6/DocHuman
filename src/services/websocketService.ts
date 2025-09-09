@@ -1,6 +1,3 @@
-// websocketService.ts
-// Utility for Business Assistant WebSocket API with streaming response support
-
 export type WSMessage = {
   type?: string;
   text?: string;
