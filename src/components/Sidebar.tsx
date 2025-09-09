@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Book, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, ChevronRight, Sparkles } from 'lucide-react';
 
 interface SidebarProps {
@@ -6,14 +6,19 @@ interface SidebarProps {
   toggleSidebar: () => void;
   navigateToUploads: () => void;
   currentScreen: string;
+  handleLogout?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   sidebarCollapsed, 
   toggleSidebar, 
   navigateToUploads, 
-  currentScreen 
-}) => (
+  currentScreen,
+  handleLogout
+}) => {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  return (
   <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#0D0D0D] flex flex-col p-4 border-r border-gray-800 transition-all duration-300 fixed left-0 top-0 h-screen z-10`}>
     <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} p-2 mb-6`}>
       <div className="flex items-center gap-2.5">
@@ -100,11 +105,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="text-sm">X</span>
           </button>
         </div>}
-        <button className={`flex items-center gap-2 px-3 py-2 bg-gray-900 rounded-lg text-sm text-gray-400 hover:bg-gray-800 transition-colors ${sidebarCollapsed ? 'justify-center' : ''}`}>
+        <span 
+          onClick={async () => {
+            if (isLoggingOut) return;
+            setIsLoggingOut(true);
+            try {
+              const authService = await import('../services/authService');
+              await authService.logout();
+              window.location.reload();
+            } catch (error) {
+              console.error('Logout failed:', error);
+              setIsLoggingOut(false);
+            }
+          }}
+          className={`flex items-center gap-2 px-3 py-2 bg-gray-900 rounded-lg text-sm text-gray-400 hover:bg-gray-800 transition-colors cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''} ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
           {!sidebarCollapsed && <span>Log out</span>}
-          <LogOut className="w-4 h-4 flex-shrink-0" />
-        </button>
+          {isLoggingOut ? (
+            <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+          ) : (
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+          )}
+        </span>
       </div>
     </div>
   </aside>
-);
+  );
+};

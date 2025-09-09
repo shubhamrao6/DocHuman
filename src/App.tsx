@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { sendMessage, ChatMessage } from './services';
+import { sendMessage, loadChatHistory, ChatMessage } from './services/chatService';
 import { LoginScreen } from './components/LoginScreen';
+import { SignupScreen } from './components/SignupScreen';
 import { LandingScreen } from './components/LandingScreen';
 import { QueryScreen } from './components/QueryScreen';
 import { ResultsScreen } from './components/ResultsScreen';
@@ -9,9 +10,10 @@ import { useAuth } from './hooks/useAuth';
 import { useFileHandling } from './hooks/useFileHandling';
 import { formatFileSize, getFileIcon } from './utils/fileUtils';
 import { allFiles } from './data/mockData';
+import { isAuthenticated, getCurrentUser } from './services/authService';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login'>('landing');
+  const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login' | 'signup'>('landing');
   const [uploadView, setUploadView] = useState<'upload' | 'allFiles'>('upload');
   const [query, setQuery] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -60,6 +62,9 @@ function App() {
         let streamingActive = true;
         const aiMessage = await sendMessage(userQuery, chatMessages, (chunk) => {
           if (streamingActive) setStreamedResponse(prev => prev + chunk);
+        }, (history) => {
+          console.log('💬 History callback received:', history);
+          setChatMessages([...history, { type: 'user', content: userQuery }]);
         });
         streamingActive = false;
         setStreamedResponse(''); // Clear streaming UI
@@ -71,6 +76,9 @@ function App() {
       let streamingActive = true;
       const aiMessage = await sendMessage(userQuery, chatMessages, (chunk) => {
         if (streamingActive) setStreamedResponse(prev => prev + chunk);
+      }, (history) => {
+        console.log('💬 History callback received:', history);
+        setChatMessages([...history, { type: 'user', content: userQuery }]);
       });
       streamingActive = false;
       setStreamedResponse(''); // Clear streaming UI
@@ -96,6 +104,41 @@ function App() {
     setCurrentScreen('login');
   };
 
+  const navigateToSignup = () => {
+    setCurrentScreen('signup');
+  };
+
+  const handleLogout = async () => {
+    console.log('🔓 App handleLogout called');
+    await auth.handleLogout();
+    console.log('🔓 Navigating to landing page');
+    setCurrentScreen('landing');
+  };
+
+  // Check authentication on app load
+  useEffect(() => {
+    if (isAuthenticated() && currentScreen === 'landing') {
+      setCurrentScreen('query');
+    }
+  }, [currentScreen]);
+
+  // Load chat history when entering results screen
+  useEffect(() => {
+    if (isAuthenticated() && currentScreen === 'results') {
+      console.log('💬 Loading chat history for results screen...');
+      console.log('💬 Current chatMessages before loading:', chatMessages);
+      loadChatHistory().then(history => {
+        console.log('💬 History loaded successfully:', history);
+        console.log('💬 Setting chat messages to:', history);
+        setChatMessages(history);
+      }).catch(error => {
+        console.error('❌ Failed to load chat history:', error);
+      });
+    }
+  }, [currentScreen]);
+
+  const currentUser = getCurrentUser();
+
   const recentlyAccessedFiles = allFiles
     .sort((a, b) => b.lastAccessed.getTime() - a.lastAccessed.getTime())
     .slice(0, 3);
@@ -116,6 +159,21 @@ function App() {
         handleEmailFormSubmit={(e) => auth.handleEmailFormSubmit(e, () => setCurrentScreen('query'))}
         handleInputChange={auth.handleInputChange}
         handleBackToLogin={auth.handleBackToLogin}
+        navigateToSignup={navigateToSignup}
+      />
+    );
+  }
+
+  if (currentScreen === 'signup') {
+    return (
+      <SignupScreen
+        isLoading={auth.isLoading}
+        signupFormData={auth.signupFormData}
+        signupFormErrors={auth.signupFormErrors}
+        handleGoogleSignup={auth.handleGoogleSignup}
+        handleSignupFormSubmit={(e) => auth.handleSignupFormSubmit(e, () => setCurrentScreen('login'))}
+        handleInputChange={auth.handleInputChange}
+        navigateToLogin={navigateToLogin}
       />
     );
   }
@@ -128,7 +186,8 @@ function App() {
         navigateToUploads={navigateToUploads}
         currentScreen={currentScreen}
         navigateToQuery={navigateToQuery}
-        navigateToLogin={navigateToLogin}
+        navigateToLogin={currentUser ? handleLogout : navigateToLogin}
+        currentUser={currentUser}
         uploadView={uploadView}
         setUploadView={setUploadView}
         selectedFiles={fileHandling.selectedFiles}
@@ -154,7 +213,8 @@ function App() {
         navigateToUploads={navigateToUploads}
         currentScreen={currentScreen}
         navigateToQuery={navigateToQuery}
-        navigateToLogin={navigateToLogin}
+        navigateToLogin={currentUser ? handleLogout : navigateToLogin}
+        currentUser={currentUser}
         chatMessages={chatMessages}
         streamedResponse={streamedResponse}
         chatEndRef={chatEndRef}
@@ -182,6 +242,9 @@ function App() {
       navigateToUploads={navigateToUploads}
       currentScreen={currentScreen}
       navigateToLanding={navigateToLanding}
+      setCurrentScreen={setCurrentScreen}
+      navigateToLogin={currentUser ? handleLogout : navigateToLogin}
+      currentUser={currentUser}
       query={query}
       setQuery={setQuery}
       handleQuerySubmit={handleQuerySubmit}

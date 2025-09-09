@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, ChevronDown, Sparkles, Send, RotateCcw, Upload } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, ChevronDown, Sparkles, Send, RotateCcw, Upload, User, LogOut } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { ChatMessage } from '../services';
 import { Sidebar } from './Sidebar';
@@ -11,6 +11,7 @@ interface ResultsScreenProps {
   currentScreen: string;
   navigateToQuery: () => void;
   navigateToLogin: () => void;
+  currentUser: { firstName: string; lastName: string; email: string } | null;
   chatMessages: ChatMessage[];
   streamedResponse: string;
   chatEndRef: React.RefObject<HTMLDivElement>;
@@ -27,6 +28,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   currentScreen,
   navigateToQuery,
   navigateToLogin,
+  currentUser,
   chatMessages,
   streamedResponse,
   chatEndRef,
@@ -35,6 +37,18 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   handleQuerySubmit,
   isMessageLoading = false
 }) => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const formatMessageContent = (content: string) => {
     return <ReactMarkdown>{content}</ReactMarkdown>;
   };
@@ -51,12 +65,6 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         <header className="w-full flex justify-between items-center mb-8">
           <div>
             <button 
-              onClick={toggleSidebar}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors mr-3"
-            >
-              {sidebarCollapsed ? <ChevronDown className="w-4 h-4 rotate-90" /> : <ChevronDown className="w-4 h-4 -rotate-90" />}
-            </button>
-            <button 
               onClick={navigateToQuery}
               className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors"
             >
@@ -68,13 +76,39 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
             <Sparkles className="w-[18px] h-[18px] text-gray-400" />
             <span>DocHuman</span>
           </div>
-          <div className="w-[88px] flex justify-end">
-            <button 
-              onClick={navigateToLogin}
-              className="text-gray-300 hover:text-white transition-colors font-medium"
-            >
-              Login
-            </button>
+          <div className="w-[88px] flex justify-end relative" ref={menuRef}>
+            {currentUser ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 p-2 bg-gray-900 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                </button>
+                {showUserMenu && (
+                  <div className="absolute right-0 top-12 w-64 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50">
+                    <div className="p-4 border-b border-gray-700">
+                      <p className="text-sm font-medium text-white">{currentUser.firstName} {currentUser.lastName}</p>
+                      <p className="text-xs text-gray-400">{currentUser.email}</p>
+                    </div>
+                    <button 
+                      onClick={navigateToLogin}
+                      className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Log out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button 
+                onClick={navigateToLogin}
+                className="text-gray-300 hover:text-white transition-colors font-medium"
+              >
+                Login
+              </button>
+            )}
           </div>
         </header>
 

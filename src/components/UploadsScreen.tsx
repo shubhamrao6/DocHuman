@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, ChevronDown, Sparkles, Upload, File, FileText } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, ChevronDown, Sparkles, Upload, File, FileText, User, LogOut } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 
 interface FileData {
@@ -19,6 +19,7 @@ interface UploadsScreenProps {
   currentScreen: string;
   navigateToQuery: () => void;
   navigateToLogin: () => void;
+  currentUser: { firstName: string; lastName: string; email: string } | null;
   uploadView: 'upload' | 'allFiles';
   setUploadView: (view: 'upload' | 'allFiles') => void;
   selectedFiles: File[];
@@ -41,6 +42,7 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
   currentScreen,
   navigateToQuery,
   navigateToLogin,
+  currentUser,
   uploadView,
   setUploadView,
   selectedFiles,
@@ -54,13 +56,32 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
   recentlyAccessedFiles,
   filteredFiles,
   getFileIcon
-}) => (
+}) => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
   <div className="bg-black text-white font-sans min-h-screen">
     <Sidebar 
       sidebarCollapsed={sidebarCollapsed}
       toggleSidebar={toggleSidebar}
       navigateToUploads={navigateToUploads}
       currentScreen={currentScreen}
+      handleLogout={() => {
+        console.log('🔓 UploadsScreen handleLogout called, currentUser:', currentUser);
+        console.log('🔓 UploadsScreen calling navigateToLogin');
+        navigateToLogin();
+      }}
     />
     <div className={`flex flex-col min-h-screen ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 p-6 bg-black`}>
       <header className="w-full flex justify-between items-center mb-8">
@@ -77,13 +98,39 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
           <Sparkles className="w-[18px] h-[18px] text-gray-400" />
           <span>DocHuman</span>
         </div>
-        <div className="w-[88px] flex justify-end">
-          <button 
-            onClick={navigateToLogin}
-            className="text-gray-300 hover:text-white transition-colors font-medium"
-          >
-            Login
-          </button>
+        <div className="w-[88px] flex justify-end relative" ref={menuRef}>
+          {currentUser ? (
+            <div className="relative">
+              <button 
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 p-2 bg-gray-900 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+              >
+                <User className="w-4 h-4" />
+              </button>
+              {showUserMenu && (
+                <div className="absolute right-0 top-12 w-64 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50">
+                  <div className="p-4 border-b border-gray-700">
+                    <p className="text-sm font-medium text-white">{currentUser.firstName} {currentUser.lastName}</p>
+                    <p className="text-xs text-gray-400">{currentUser.email}</p>
+                  </div>
+                  <button 
+                    onClick={navigateToLogin}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Log out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button 
+              onClick={navigateToLogin}
+              className="text-gray-300 hover:text-white transition-colors font-medium"
+            >
+              Login
+            </button>
+          )}
         </div>
       </header>
 
@@ -343,4 +390,5 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
       </main>
     </div>
   </div>
-);
+  );
+};

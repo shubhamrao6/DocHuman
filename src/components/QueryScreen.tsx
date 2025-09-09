@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, ChevronRight, Send } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, ChevronRight, Send, User, LogOut } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 
 interface QueryScreenProps {
@@ -8,6 +8,9 @@ interface QueryScreenProps {
   navigateToUploads: () => void;
   currentScreen: string;
   navigateToLanding: () => void;
+  setCurrentScreen: (screen: 'landing' | 'query' | 'results' | 'uploads' | 'login' | 'signup') => void;
+  navigateToLogin: () => void;
+  currentUser: { firstName: string; lastName: string; email: string } | null;
   query: string;
   setQuery: (query: string) => void;
   handleQuerySubmit: (e: React.FormEvent) => void;
@@ -21,12 +24,29 @@ export const QueryScreen: React.FC<QueryScreenProps> = ({
   navigateToUploads,
   currentScreen,
   navigateToLanding,
+  setCurrentScreen,
+  navigateToLogin,
+  currentUser,
   query,
   setQuery,
   handleQuerySubmit,
   handleSuggestionClick,
   isMessageLoading = false
-}) => (
+}) => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
+  return (
   <div className="bg-black text-white font-sans min-h-screen flex">
     <Sidebar 
       sidebarCollapsed={sidebarCollapsed}
@@ -36,20 +56,56 @@ export const QueryScreen: React.FC<QueryScreenProps> = ({
     />
     <div className={`flex-1 flex flex-col p-6 ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300`}>
       <header className="w-full flex justify-between items-center">
-        <div>
+        <div className="relative z-20">
           <button 
-            onClick={navigateToLanding}
-            className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+            onClick={() => {
+              console.log('Go To Chat clicked');
+              setCurrentScreen('results');
+            }}
+            className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors relative z-20"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back
+            Go To Chat
           </button>
         </div>
         <div className="flex items-center space-x-2 text-lg font-medium text-gray-200">
           <ChevronRight className="w-[18px] h-[18px] text-gray-400" />
           <span>DocHuman</span>
         </div>
-        <div className="w-[88px]"></div>
+        <div className="w-[88px] flex justify-end relative" ref={menuRef}>
+          {currentUser ? (
+            <div className="relative">
+              <button 
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 p-2 bg-gray-900 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+              >
+                <User className="w-4 h-4" />
+              </button>
+              {showUserMenu && (
+                <div className="absolute right-0 top-12 w-64 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50">
+                  <div className="p-4 border-b border-gray-700">
+                    <p className="text-sm font-medium text-white">{currentUser.firstName} {currentUser.lastName}</p>
+                    <p className="text-xs text-gray-400">{currentUser.email}</p>
+                  </div>
+                  <button 
+                    onClick={navigateToLogin}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Log out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button 
+              onClick={navigateToLogin}
+              className="text-gray-300 hover:text-white transition-colors font-medium"
+            >
+              Login
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="flex-grow flex flex-col items-center justify-center -mt-10">
@@ -114,4 +170,5 @@ export const QueryScreen: React.FC<QueryScreenProps> = ({
 
     </div>
   </div>
-);
+  );
+};
