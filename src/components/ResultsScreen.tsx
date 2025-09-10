@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, ChevronDown, Sparkles, Send, RotateCcw, Upload, User, LogOut } from 'lucide-react';
+import React from 'react';
+import { Send, RotateCcw, Upload } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { ChatMessage } from '../services';
 import { Sidebar } from './Sidebar';
+import { Navbar } from './Navbar';
 
 interface ResultsScreenProps {
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
   navigateToUploads: () => void;
   currentScreen: string;
+  setCurrentScreen: (screen: string) => void;
   navigateToQuery: () => void;
   navigateToLogin: () => void;
   currentUser: { firstName: string; lastName: string; email: string } | null;
@@ -28,6 +30,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   toggleSidebar,
   navigateToUploads,
   currentScreen,
+  setCurrentScreen,
   navigateToQuery,
   navigateToLogin,
   currentUser,
@@ -41,18 +44,6 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   isLoadingHistory,
   isMessageLoading = false
 }) => {
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowUserMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
   const formatMessageContent = (content: string) => {
     return <ReactMarkdown>{content}</ReactMarkdown>;
   };
@@ -63,60 +54,22 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         sidebarCollapsed={sidebarCollapsed}
         toggleSidebar={toggleSidebar}
         navigateToUploads={navigateToUploads}
+        navigateToQuery={navigateToQuery}
         currentScreen={currentScreen}
+        setCurrentScreen={setCurrentScreen}
       />
-      <div className={`flex-1 flex flex-col p-6 ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300`}>
-        <header className="w-full flex justify-between items-center mb-8">
-          <div>
-            <button 
-              onClick={navigateToQuery}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </button>
-          </div>
-          <div className="flex items-center space-x-2 text-lg font-medium text-gray-200">
-            <Sparkles className="w-[18px] h-[18px] text-gray-400" />
-            <span>DocHuman</span>
-          </div>
-          <div className="w-[88px] flex justify-end relative" ref={menuRef}>
-            {currentUser ? (
-              <div className="relative">
-                <button 
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 p-2 bg-gray-900 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
-                >
-                  <User className="w-4 h-4" />
-                </button>
-                {showUserMenu && (
-                  <div className="absolute right-0 top-12 w-64 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50">
-                    <div className="p-4 border-b border-gray-700">
-                      <p className="text-sm font-medium text-white">{currentUser.firstName} {currentUser.lastName}</p>
-                      <p className="text-xs text-gray-400">{currentUser.email}</p>
-                    </div>
-                    <button 
-                      onClick={navigateToLogin}
-                      className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Log out
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button 
-                onClick={navigateToLogin}
-                className="text-gray-300 hover:text-white transition-colors font-medium"
-              >
-                Login
-              </button>
-            )}
-          </div>
-        </header>
+      <div className={`flex-1 flex flex-col ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 h-screen`}>
+        <Navbar 
+          currentScreen={currentScreen}
+          currentUser={currentUser}
+          navigateToLogin={navigateToLogin}
+          onBackClick={navigateToQuery}
+        />
 
-        <main className="flex-grow overflow-y-auto px-4 sm:px-10 py-4">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-10 py-4" style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#374151 #111827'
+        }}>
           <div className="w-full max-w-2xl mx-auto space-y-6">
             {chatMessages.length > 0 && (
               <div className="text-center mb-4">
@@ -224,46 +177,32 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
           </div>
         </main>
         
-        <div className="w-full mt-8 px-4 sm:px-10">
-          <form onSubmit={handleQuerySubmit} className="w-full max-w-2xl mx-auto mb-6">
-            <div className="relative">
-              <input 
-                type="text" 
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="What would you like to create today?" 
-                className="w-full h-12 px-4 pr-12 bg-[#1A1A1A] border border-gray-700 rounded-lg focus:ring-1 focus:ring-gray-500 focus:border-gray-500 focus:outline-none placeholder-gray-500 text-base text-white"
-              />
-              <button
-                type="submit"
-                disabled={isMessageLoading}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
-              >
-                {isMessageLoading ? (
-                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </form>
+        <div className="flex-shrink-0 border-t border-gray-800">
+          <div className="w-full px-4 sm:px-10 py-4">
+            <form onSubmit={handleQuerySubmit} className="w-full max-w-2xl mx-auto mb-4">
+              <div className="relative">
+                <input 
+                  type="text" 
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="What would you like to create today?" 
+                  className="w-full h-12 px-4 pr-12 bg-[#1A1A1A] border border-gray-700 rounded-lg focus:ring-1 focus:ring-gray-500 focus:border-gray-500 focus:outline-none placeholder-gray-500 text-base text-white"
+                />
+                <button
+                  type="submit"
+                  disabled={isMessageLoading}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                >
+                  {isMessageLoading ? (
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        
-        <footer className="w-full flex justify-between items-center px-10">
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-              <RotateCcw className="w-4 h-4" />
-              Refine
-            </button>
-            <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-              <Upload className="w-4 h-4" />
-              Export
-            </button>
-          </div>
-          <div>
-            <span className="text-sm text-gray-500">1 of 1</span>
-          </div>
-        </footer>
       </div>
     </div>
   );

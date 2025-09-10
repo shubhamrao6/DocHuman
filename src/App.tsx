@@ -6,6 +6,7 @@ import { LandingScreen } from './components/LandingScreen';
 import { QueryScreen } from './components/QueryScreen';
 import { ResultsScreen } from './components/ResultsScreen';
 import { UploadsScreen } from './components/UploadsScreen';
+import { KnowledgeBaseScreen } from './components/KnowledgeBaseScreen';
 import { useAuth } from './hooks/useAuth';
 import { useFileHandling } from './hooks/useFileHandling';
 import { formatFileSize, getFileIcon } from './utils/fileUtils';
@@ -13,7 +14,7 @@ import { allFiles } from './data/mockData';
 import { isAuthenticated, getCurrentUser } from './services/authService';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login' | 'signup'>('landing');
+  const [currentScreen, setCurrentScreen] = useState<'landing' | 'query' | 'results' | 'uploads' | 'login' | 'signup' | 'knowledgebase'>('landing');
   const [uploadView, setUploadView] = useState<'upload' | 'allFiles'>('upload');
   const [query, setQuery] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -23,6 +24,7 @@ function App() {
   const [isMessageLoading, setIsMessageLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isLoadingMoreHistory, setIsLoadingMoreHistory] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
   const auth = useAuth();
   const fileHandling = useFileHandling();
@@ -30,10 +32,10 @@ function App() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (currentScreen === 'results' && chatEndRef.current && !isLoadingMoreHistory && (streamedResponse || isMessageLoading)) {
+    if (currentScreen === 'results' && chatEndRef.current && (streamedResponse || isMessageLoading)) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [streamedResponse, currentScreen, isLoadingMoreHistory, isMessageLoading]);
+  }, [streamedResponse, currentScreen, isMessageLoading]);
 
   const navigateToQuery = () => {
     setCurrentScreen('query');
@@ -144,12 +146,15 @@ function App() {
     if (isAuthenticated() && currentScreen === 'results') {
       console.log('💬 Loading chat history for results screen...');
       console.log('💬 Current chatMessages before loading:', chatMessages);
+      setIsLoadingMessages(true);
       loadChatHistory().then(history => {
         console.log('💬 History loaded successfully:', history);
         console.log('💬 Setting chat messages to:', history);
         setChatMessages(history);
       }).catch(error => {
         console.error('❌ Failed to load chat history:', error);
+      }).finally(() => {
+        setIsLoadingMessages(false);
       });
     }
   }, [currentScreen]);
@@ -202,6 +207,7 @@ function App() {
         toggleSidebar={toggleSidebar}
         navigateToUploads={navigateToUploads}
         currentScreen={currentScreen}
+        setCurrentScreen={setCurrentScreen}
         navigateToQuery={navigateToQuery}
         navigateToLogin={currentUser ? handleLogout : navigateToLogin}
         currentUser={currentUser}
@@ -222,6 +228,21 @@ function App() {
     );
   }
 
+  if (currentScreen === 'knowledgebase') {
+    return (
+      <KnowledgeBaseScreen
+        sidebarCollapsed={sidebarCollapsed}
+        toggleSidebar={toggleSidebar}
+        navigateToUploads={navigateToUploads}
+        navigateToQuery={navigateToQuery}
+        currentScreen={currentScreen}
+        setCurrentScreen={setCurrentScreen}
+        navigateToLogin={currentUser ? handleLogout : navigateToLogin}
+        currentUser={currentUser}
+      />
+    );
+  }
+
   if (currentScreen === 'results') {
     return (
       <ResultsScreen
@@ -229,6 +250,7 @@ function App() {
         toggleSidebar={toggleSidebar}
         navigateToUploads={navigateToUploads}
         currentScreen={currentScreen}
+        setCurrentScreen={setCurrentScreen}
         navigateToQuery={navigateToQuery}
         navigateToLogin={currentUser ? handleLogout : navigateToLogin}
         currentUser={currentUser}
@@ -241,6 +263,7 @@ function App() {
         handleLoadMoreHistory={handleLoadMoreHistory}
         isLoadingHistory={isLoadingHistory}
         isMessageLoading={isMessageLoading}
+        isLoadingMessages={isLoadingMessages}
       />
     );
   }
@@ -259,6 +282,7 @@ function App() {
       sidebarCollapsed={sidebarCollapsed}
       toggleSidebar={toggleSidebar}
       navigateToUploads={navigateToUploads}
+      navigateToQuery={navigateToQuery}
       currentScreen={currentScreen}
       navigateToLanding={navigateToLanding}
       setCurrentScreen={setCurrentScreen}

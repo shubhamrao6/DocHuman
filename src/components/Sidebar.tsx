@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Book, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, ChevronRight, Sparkles } from 'lucide-react';
+import { Book, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, ChevronRight, Sparkles, MessageSquare } from 'lucide-react';
 
 interface SidebarProps {
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
   navigateToUploads: () => void;
+  navigateToQuery?: () => void;
   currentScreen: string;
+  setCurrentScreen?: (screen: string) => void;
   handleLogout?: () => void;
 }
 
@@ -13,7 +15,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   sidebarCollapsed, 
   toggleSidebar, 
   navigateToUploads, 
+  navigateToQuery,
   currentScreen,
+  setCurrentScreen,
   handleLogout
 }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -45,9 +49,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </button>
 
     <nav className="flex-grow space-y-1">
-      <span className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''}`}>
+      <span 
+        onClick={navigateToQuery}
+        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''} ${
+          currentScreen === 'query' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:bg-gray-900 hover:text-gray-100'
+        } transition-colors`}
+      >
+        <MessageSquare className="w-5 h-5 flex-shrink-0" />
+        {!sidebarCollapsed && <span>Ask DocHuman</span>}
+      </span>
+      
+      <span 
+        onClick={() => setCurrentScreen && setCurrentScreen('knowledgebase')}
+        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''} ${
+          currentScreen === 'knowledgebase' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:bg-gray-900 hover:text-gray-100'
+        } transition-colors`}
+      >
         <Book className="w-5 h-5 flex-shrink-0" />
         {!sidebarCollapsed && <span>Knowledge Base</span>}
+      </span>
+      
+      <span 
+        onClick={navigateToUploads}
+        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''} ${
+          currentScreen === 'uploads' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:bg-gray-900 hover:text-gray-100'
+        } transition-colors`}
+      >
+        <FileText className="w-5 h-5 flex-shrink-0" />
+        {!sidebarCollapsed && <span>Files</span>}
       </span>
       
       <div>
@@ -59,16 +88,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!sidebarCollapsed && <ChevronDown className="w-3 h-3" />}
         </button>
       </div>
-      
-      <span 
-        onClick={navigateToUploads}
-        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''} ${
-          currentScreen === 'uploads' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:bg-gray-900 hover:text-gray-100'
-        } transition-colors`}
-      >
-        <FileText className="w-5 h-5 flex-shrink-0" />
-        {!sidebarCollapsed && <span>Files</span>}
-      </span>
       
       <span className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-gray-100 transition-colors cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''}`}>
         <Users className="w-5 h-5 flex-shrink-0" />
