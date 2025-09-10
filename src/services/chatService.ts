@@ -57,7 +57,7 @@ export function sendMessage(query: string, chatMessages: ChatMessage[], onStream
   });
 }
 
-export function loadChatHistory(): Promise<ChatMessage[]> {
+export function loadChatHistory(start: number = 0, end: number = 10): Promise<ChatMessage[]> {
   return new Promise((resolve, reject) => {
     const auth = getStoredAuth();
     if (!auth || !auth.idToken) {
@@ -85,7 +85,11 @@ export function loadChatHistory(): Promise<ChatMessage[]> {
       }
     }).then(() => {
       console.log('🔄 Sending load_history action...');
-      wsService.loadHistory();
+      wsService.sendPayload({
+        action: 'load_history',
+        start,
+        end
+      });
     }).catch(reject);
   });
 }

@@ -64,8 +64,8 @@ export const QueryScreen: React.FC<QueryScreenProps> = ({
             }}
             className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-md text-sm text-gray-300 hover:bg-gray-800 transition-colors relative z-20"
           >
-            <ArrowLeft className="w-4 h-4" />
             Go To Chat
+            <ArrowLeft className="w-4 h-4 rotate-180" />
           </button>
         </div>
         <div className="flex items-center space-x-2 text-lg font-medium text-gray-200">

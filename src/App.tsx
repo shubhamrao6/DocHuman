@@ -21,6 +21,8 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [streamedResponse, setStreamedResponse] = useState('');
   const [isMessageLoading, setIsMessageLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isLoadingMoreHistory, setIsLoadingMoreHistory] = useState(false);
 
   const auth = useAuth();
   const fileHandling = useFileHandling();
@@ -28,10 +30,10 @@ function App() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (currentScreen === 'results' && chatEndRef.current) {
+    if (currentScreen === 'results' && chatEndRef.current && !isLoadingMoreHistory && (streamedResponse || isMessageLoading)) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [chatMessages, streamedResponse, currentScreen]);
+  }, [streamedResponse, currentScreen, isLoadingMoreHistory, isMessageLoading]);
 
   const navigateToQuery = () => {
     setCurrentScreen('query');
@@ -113,6 +115,21 @@ function App() {
     await auth.handleLogout();
     console.log('🔓 Navigating to landing page');
     setCurrentScreen('landing');
+  };
+
+  const handleLoadMoreHistory = async () => {
+    if (isLoadingHistory) return;
+    setIsLoadingHistory(true);
+    setIsLoadingMoreHistory(true);
+    try {
+      const moreHistory = await loadChatHistory(chatMessages.length, chatMessages.length + 10);
+      setChatMessages(prev => [...moreHistory, ...prev]);
+    } catch (error) {
+      console.error('❌ Failed to load more history:', error);
+    } finally {
+      setIsLoadingHistory(false);
+      setTimeout(() => setIsLoadingMoreHistory(false), 100);
+    }
   };
 
   // Check authentication on app load
@@ -221,6 +238,8 @@ function App() {
         query={query}
         setQuery={setQuery}
         handleQuerySubmit={handleQuerySubmit}
+        handleLoadMoreHistory={handleLoadMoreHistory}
+        isLoadingHistory={isLoadingHistory}
         isMessageLoading={isMessageLoading}
       />
     );

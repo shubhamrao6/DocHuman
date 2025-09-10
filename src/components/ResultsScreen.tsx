@@ -18,6 +18,8 @@ interface ResultsScreenProps {
   query: string;
   setQuery: (query: string) => void;
   handleQuerySubmit: (e: React.FormEvent) => void;
+  handleLoadMoreHistory: () => void;
+  isLoadingHistory: boolean;
   isMessageLoading?: boolean;
 }
 
@@ -35,6 +37,8 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   query,
   setQuery,
   handleQuerySubmit,
+  handleLoadMoreHistory,
+  isLoadingHistory,
   isMessageLoading = false
 }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -114,6 +118,24 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
 
         <main className="flex-grow overflow-y-auto px-4 sm:px-10 py-4">
           <div className="w-full max-w-2xl mx-auto space-y-6">
+            {chatMessages.length > 0 && (
+              <div className="text-center mb-4">
+                <button 
+                  onClick={handleLoadMoreHistory}
+                  disabled={isLoadingHistory}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
+                >
+                  {isLoadingHistory ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                      Loading...
+                    </>
+                  ) : (
+                    'Load previous 10 messages'
+                  )}
+                </button>
+              </div>
+            )}
             {chatMessages.map((message, index) => (
               <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {message.type === 'user' ? (
