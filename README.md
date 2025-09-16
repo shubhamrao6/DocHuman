@@ -155,6 +155,10 @@ yarn lint
 3. Add API calls to `src/services/`
 4. Use utilities from `src/utils/`
 
+## Development Repository
+
+There is another remote called development available at: https://github.com/shubhamrao6/DocHuman.git
+
 ## Contributing
 
 Contributions are welcome! Please open issues or submit pull requests for improvements or bug fixes.
