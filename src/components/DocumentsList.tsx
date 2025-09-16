@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FileText, Eye, Trash2, X, Download, Upload } from 'lucide-react';
+import { FileText, Eye, Trash2, X, Download, Upload, Image } from 'lucide-react';
 import { Document, deleteDocument, getDocumentDetails } from '../services/documentsService';
+import { Image as ImageType, deleteImage, getImageDetails } from '../services/imagesService';
 
 interface DocumentsListProps {
   documents: Document[];
+  images: ImageType[];
   isLoading: boolean;
   onRefresh: () => void;
   showUploadButton?: boolean;
@@ -13,19 +15,21 @@ interface DocumentsListProps {
 
 export const DocumentsList: React.FC<DocumentsListProps> = ({
   documents,
+  images,
   isLoading,
   onRefresh,
   showUploadButton = false,
   onUploadClick,
   searchPlaceholder = "Search through documents..."
 }) => {
+  const [viewType, setViewType] = useState<'documents' | 'images'>('documents');
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteDocId, setDeleteDocId] = useState<string>('');
-  const [deleteDocName, setDeleteDocName] = useState<string>('');
+  const [deleteItemId, setDeleteItemId] = useState<string>('');
+  const [deleteItemName, setDeleteItemName] = useState<string>('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showDocDetails, setShowDocDetails] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState<any>(null);
+  const [showItemDetails, setShowItemDetails] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const deleteModalRef = useRef<HTMLDivElement>(null);
   const detailsModalRef = useRef<HTMLDivElement>(null);
@@ -36,41 +40,56 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
         setShowDeleteConfirm(false);
       }
       if (detailsModalRef.current && !detailsModalRef.current.contains(event.target as Node)) {
-        setShowDocDetails(false);
+        setShowItemDetails(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleDeleteClick = (documentId: string, filename: string) => {
-    setDeleteDocId(documentId);
-    setDeleteDocName(filename);
+  const handleDeleteClick = (itemId: string, filename: string) => {
+    setDeleteItemId(itemId);
+    setDeleteItemName(filename);
     setShowDeleteConfirm(true);
   };
 
   const handleDeleteConfirm = async () => {
     setIsDeleting(true);
     try {
-      await deleteDocument(deleteDocId);
+      if (viewType === 'documents') {
+        await deleteDocument(deleteItemId);
+      } else {
+        await deleteImage(deleteItemId);
+      }
       onRefresh();
       setShowDeleteConfirm(false);
     } catch (error) {
-      console.error('Failed to delete document:', error);
+      console.error(`Failed to delete ${viewType.slice(0, -1)}:`, error);
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const handleOpenDocument = async (documentId: string) => {
+  const handleOpenItem = async (itemId: string) => {
     setIsLoadingDetails(true);
-    setShowDocDetails(true);
+    setShowItemDetails(true);
     try {
-      const details = await getDocumentDetails(documentId);
-      setSelectedDoc(details);
+      const details = viewType === 'documents' 
+        ? await getDocumentDetails(itemId)
+        : await getImageDetails(itemId);
+      
+      // Get filename from list item if not in details
+      const listItem = currentItems.find(item => 
+        viewType === 'documents' ? (item as Document).documentId === itemId : (item as ImageType).imageId === itemId
+      );
+      
+      setSelectedItem({
+        ...details,
+        filename: details.filename || listItem?.filename
+      });
     } catch (error) {
-      console.error('Failed to load document details:', error);
-      setShowDocDetails(false);
+      console.error(`Failed to load ${viewType.slice(0, -1)} details:`, error);
+      setShowItemDetails(false);
     } finally {
       setIsLoadingDetails(false);
     }
@@ -110,14 +129,41 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
     }
   };
 
-  const filteredDocuments = documents.filter(doc =>
-    doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
+  const currentItems = viewType === 'documents' ? documents : images;
+  const filteredItems = currentItems.filter(item =>
+    item.filename.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <>
       <div className="bg-gray-900/50 rounded-xl p-6">
         <div className="flex items-center gap-4 mb-6">
+          {/* View Type Slider */}
+          <div className="flex items-center bg-gray-800 p-1 rounded-lg">
+            <button 
+              onClick={() => setViewType('documents')}
+              className={`px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 transition-colors ${
+                viewType === 'documents' 
+                  ? 'text-white bg-gray-700' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              Docs
+            </button>
+            <button 
+              onClick={() => setViewType('images')}
+              className={`px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 transition-colors ${
+                viewType === 'images' 
+                  ? 'text-white bg-gray-700' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Image className="w-4 h-4" />
+              Images
+            </button>
+          </div>
+          
           <div className="relative flex-1">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,60 +210,67 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : filteredDocuments.length === 0 ? (
+        ) : filteredItems.length === 0 ? (
           <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+            {viewType === 'documents' ? (
+              <FileText className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+            ) : (
+              <Image className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+            )}
             <p className="text-gray-400">
-              {searchQuery ? 'No documents match your search.' : 'No documents found.'}
+              {searchQuery ? `No ${viewType} match your search.` : `No ${viewType} found.`}
             </p>
           </div>
         ) : (
           <>
             <div className="space-y-0">
-              {filteredDocuments.slice(0, 10).map((doc) => (
-                <div key={doc.documentId} className="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
-                  <div className="col-span-4 flex items-center gap-3 min-w-0">
-                    {getFileIcon(doc.fileType)}
-                    <span className="text-white font-medium text-sm truncate">{doc.filename}</span>
+              {filteredItems.slice(0, 10).map((item) => {
+                const itemId = viewType === 'documents' ? (item as Document).documentId : (item as ImageType).imageId;
+                return (
+                  <div key={itemId} className="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
+                    <div className="col-span-4 flex items-center gap-3 min-w-0">
+                      {viewType === 'documents' ? getFileIcon((item as Document).fileType) : <div className="w-8 h-8 bg-purple-500 rounded flex items-center justify-center text-white text-[10px] font-bold">IMG</div>}
+                      <span className="text-white font-medium text-sm truncate">{item.filename}</span>
+                    </div>
+                    <div className="col-span-2 text-gray-400 text-sm">{formatFileSize(item.fileSize)}</div>
+                    <div className="col-span-2 flex items-center gap-2">
+                      {(viewType === 'documents' && item.status === 'processed') || (viewType === 'images' && (item.status === 'generated' || item.status === 'uploaded')) ? (
+                        <>
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span className="text-green-400 text-sm">Complete</span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                          <span className="text-yellow-400 text-sm">Processing</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="col-span-2 text-gray-400 text-sm">{new Date(item.createdAt).toLocaleDateString()}</div>
+                    <div className="col-span-2 flex items-center gap-2 justify-end">
+                      <button 
+                        onClick={() => handleOpenItem(itemId)}
+                        className="flex items-center gap-1 bg-gray-700 hover:bg-gray-600 text-white text-xs font-medium py-1 px-2 rounded-md transition-colors"
+                      >
+                        <Eye className="w-3 h-3" />
+                        Open
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteClick(itemId, item.filename)}
+                        className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white text-xs font-medium py-1 px-2 rounded-md transition-colors"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                  <div className="col-span-2 text-gray-400 text-sm">{formatFileSize(doc.fileSize)}</div>
-                  <div className="col-span-2 flex items-center gap-2">
-                    {doc.status === 'processed' ? (
-                      <>
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span className="text-green-400 text-sm">Complete</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                        <span className="text-yellow-400 text-sm">Processing</span>
-                      </>
-                    )}
-                  </div>
-                  <div className="col-span-2 text-gray-400 text-sm">{new Date(doc.createdAt).toLocaleDateString()}</div>
-                  <div className="col-span-2 flex items-center gap-2 justify-end">
-                    <button 
-                      onClick={() => handleOpenDocument(doc.documentId)}
-                      className="flex items-center gap-1 bg-gray-700 hover:bg-gray-600 text-white text-xs font-medium py-1 px-2 rounded-md transition-colors"
-                    >
-                      <Eye className="w-3 h-3" />
-                      Open
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteClick(doc.documentId, doc.filename)}
-                      className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white text-xs font-medium py-1 px-2 rounded-md transition-colors"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-700">
               <div className="text-sm text-gray-400">
-                Showing 1-{Math.min(10, filteredDocuments.length)} of {filteredDocuments.length} documents
+                Showing 1-{Math.min(10, filteredItems.length)} of {filteredItems.length} {viewType}
               </div>
             </div>
           </>
@@ -238,7 +291,7 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
               </button>
             </div>
             <p className="text-gray-300 mb-6">
-              Are you sure you want to delete <span className="font-medium text-white">{deleteDocName}</span>? This action cannot be undone.
+              Are you sure you want to delete <span className="font-medium text-white">{deleteItemName}</span>? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
@@ -266,14 +319,14 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
         </div>
       )}
 
-      {/* Document Details Modal */}
-      {showDocDetails && (
+      {/* Item Details Modal */}
+      {showItemDetails && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div ref={detailsModalRef} className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b border-gray-700">
-              <h2 className="text-lg font-semibold text-white">Document Details</h2>
+              <h2 className="text-lg font-semibold text-white">{viewType === 'documents' ? 'Document' : 'Image'} Details</h2>
               <button 
-                onClick={() => setShowDocDetails(false)}
+                onClick={() => setShowItemDetails(false)}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -284,48 +337,60 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
                 <div className="flex items-center justify-center py-12">
                   <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                 </div>
-              ) : selectedDoc ? (
+              ) : selectedItem ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">Filename</label>
-                      <p className="text-white">{selectedDoc.filename}</p>
+                      <p className="text-white">{selectedItem.filename}</p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">File Type</label>
-                      <p className="text-white">{selectedDoc.fileType}</p>
-                    </div>
+                    {viewType === 'documents' && selectedItem.fileType && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">File Type</label>
+                        <p className="text-white">{selectedItem.fileType}</p>
+                      </div>
+                    )}
+                    {viewType === 'images' && selectedItem.prompt && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Prompt</label>
+                        <p className="text-white">{selectedItem.prompt}</p>
+                      </div>
+                    )}
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">File Size</label>
-                      <p className="text-white">{formatFileSize(selectedDoc.fileSize)}</p>
+                      <p className="text-white">{formatFileSize(selectedItem.fileSize)}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">Status</label>
-                      <p className={`${selectedDoc.status === 'processed' ? 'text-green-400' : 'text-yellow-400'}`}>
-                        {selectedDoc.status === 'processed' ? 'Complete' : 'Processing'}
+                      <p className={`${(viewType === 'documents' && selectedItem.status === 'processed') || (viewType === 'images' && (selectedItem.status === 'generated' || selectedItem.status === 'uploaded')) ? 'text-green-400' : 'text-yellow-400'}`}>
+                        {(viewType === 'documents' && selectedItem.status === 'processed') || (viewType === 'images' && (selectedItem.status === 'generated' || selectedItem.status === 'uploaded')) ? 'Complete' : 'Processing'}
                       </p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">Created At</label>
-                      <p className="text-white">{new Date(selectedDoc.createdAt).toLocaleString()}</p>
+                      <p className="text-white">{new Date(selectedItem.createdAt).toLocaleString()}</p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">Chunk Count</label>
-                      <p className="text-white">{selectedDoc.chunkCount}</p>
-                    </div>
+                    {viewType === 'documents' && selectedItem.chunkCount && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Chunk Count</label>
+                        <p className="text-white">{selectedItem.chunkCount}</p>
+                      </div>
+                    )}
+                    {viewType === 'images' && selectedItem.provider && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Provider</label>
+                        <p className="text-white">{selectedItem.provider}</p>
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Document ID</label>
-                    <p className="text-white font-mono text-sm">{selectedDoc.documentId}</p>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">{viewType === 'documents' ? 'Document' : 'Image'} ID</label>
+                    <p className="text-white font-mono text-sm">{viewType === 'documents' ? selectedItem.documentId : selectedItem.imageId}</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Knowledge Base ID</label>
-                    <p className="text-white font-mono text-sm">{selectedDoc.knowledgeDbId}</p>
-                  </div>
-                  {selectedDoc.downloadUrl && (
+                  {selectedItem.downloadUrl && (
                     <div className="pt-4 border-t border-gray-700">
                       <a 
-                        href={selectedDoc.downloadUrl}
+                        href={selectedItem.downloadUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors inline-flex"
@@ -337,7 +402,7 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
                   )}
                 </div>
               ) : (
-                <p className="text-gray-400 text-center py-4">Failed to load document details</p>
+                <p className="text-gray-400 text-center py-4">Failed to load {viewType.slice(0, -1)} details</p>
               )}
             </div>
           </div>

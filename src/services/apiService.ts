@@ -47,6 +47,48 @@ export const apiService = {
       headers: { Authorization: `Bearer ${accessToken}` },
     }),
   
+  uploadDocumentFile: (accessToken: string, file: File, knowledgeDbId: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('knowledgeDbId', knowledgeDbId);
+    return api.post('/documents/upload', formData, {
+      headers: { 
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'multipart/form-data'
+      },
+    });
+  },
+  
+  uploadImageFile: (accessToken: string, file: File, knowledgeDbId: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('knowledgeDbId', knowledgeDbId);
+    return api.post('/images/upload', formData, {
+      headers: { 
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'multipart/form-data'
+      },
+    });
+  },
+
+  // Images
+  listImages: (accessToken: string, knowledgeDbId?: string) => {
+    const url = knowledgeDbId ? `/images?knowledgeDbId=${knowledgeDbId}` : '/images';
+    return api.get(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+  },
+  
+  getImageDetails: (accessToken: string, imageId: string) =>
+    api.get(`/images/${imageId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }),
+  
+  deleteImage: (accessToken: string, imageId: string) =>
+    api.delete(`/images/${imageId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }),
+  
   listDocuments: (accessToken: string, knowledgeDbId?: string) => {
     const url = knowledgeDbId ? `/documents?knowledgeDbId=${knowledgeDbId}` : '/documents';
     return api.get(url, {

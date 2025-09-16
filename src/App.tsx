@@ -25,6 +25,7 @@ function App() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isLoadingMoreHistory, setIsLoadingMoreHistory] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [selectedKnowledgeBase, setSelectedKnowledgeBase] = useState<string>('');
 
   const auth = useAuth();
   const fileHandling = useFileHandling();
@@ -224,6 +225,8 @@ function App() {
         recentlyAccessedFiles={recentlyAccessedFiles}
         filteredFiles={filteredFiles}
         getFileIcon={getFileIcon}
+        selectedKnowledgeBase={selectedKnowledgeBase}
+        setSelectedKnowledgeBase={setSelectedKnowledgeBase}
       />
     );
   }
@@ -239,6 +242,8 @@ function App() {
         setCurrentScreen={setCurrentScreen}
         navigateToLogin={currentUser ? handleLogout : navigateToLogin}
         currentUser={currentUser}
+        selectedKnowledgeBase={selectedKnowledgeBase}
+        setSelectedKnowledgeBase={setSelectedKnowledgeBase}
       />
     );
   }
@@ -264,6 +269,8 @@ function App() {
         isLoadingHistory={isLoadingHistory}
         isMessageLoading={isMessageLoading}
         isLoadingMessages={isLoadingMessages}
+        selectedKnowledgeBase={selectedKnowledgeBase}
+        setSelectedKnowledgeBase={setSelectedKnowledgeBase}
       />
     );
   }
@@ -293,6 +300,8 @@ function App() {
       handleQuerySubmit={handleQuerySubmit}
       handleSuggestionClick={handleSuggestionClick}
       isMessageLoading={isMessageLoading}
+      selectedKnowledgeBase={selectedKnowledgeBase}
+      setSelectedKnowledgeBase={setSelectedKnowledgeBase}
     />
   );
 }

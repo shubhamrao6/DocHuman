@@ -164,20 +164,38 @@ curl -X GET {API_URL}/knowledgedbs \
 
 **Endpoint**: `POST /documents/upload`
 
-**For Text File**:
 ```bash
-# First, encode your text file to base64
-echo "This is a test document with important information about API testing." | base64
+# Create a test document file
+echo "This is a test document with important information about API testing." > test-document.txt
 
+# Upload using multipart form data
 curl -X POST {API_URL}/documents/upload \
-  -H "Content-Type: application/json" \
   -H "Authorization: Bearer {ACCESS_TOKEN}" \
-  -d '{
-    "fileContent": "VGhpcyBpcyBhIHRlc3QgZG9jdW1lbnQgd2l0aCBpbXBvcnRhbnQgaW5mb3JtYXRpb24gYWJvdXQgQVBJIHRlc3RpbmcuCg==",
-    "filename": "test-document.txt",
-    "fileType": "text/plain",
-    "knowledgeDbId": "kb-uuid-456"
-  }'
+  -F "file=@test-document.txt" \
+  -F "knowledgeDbId=kb-uuid-456"
+```
+
+**Supported File Types**:
+- **PDF**: `application/pdf`
+- **DOCX**: `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+- **TXT**: `text/plain`
+- **MD**: `text/markdown`
+
+**File Size Limit**: 10MB
+
+**Error Examples**:
+```bash
+# Unsupported file type (DOC)
+curl -X POST {API_URL}/documents/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@document.doc"
+# Response: {"error": "DOC files are not supported yet. Please convert to DOCX format."}
+
+# File too large
+curl -X POST {API_URL}/documents/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@large-file.pdf"
+# Response: {"error": "File size exceeds 10MB limit"}
 ```
 
 **Expected Response**:
@@ -194,7 +212,44 @@ curl -X POST {API_URL}/documents/upload \
 
 ---
 
-### Step 7: List Documents (Auth Required)
+### Step 7: Generate Document (Auth Required)
+
+**Endpoint**: `POST /documents/generate`
+
+```bash
+curl -X POST {API_URL}/documents/generate \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -d '{
+    "prompt": "Create a comprehensive guide about machine learning fundamentals, including supervised learning, unsupervised learning, and neural networks",
+    "knowledgeDbId": "kb-uuid-456"
+  }'
+```
+
+**Expected Response**:
+```json
+{
+  "documentId": "doc-uuid-890",
+  "filename": "create-a-comprehensive-guide-about-machine-learning.md",
+  "prompt": "Create a comprehensive guide about machine learning fundamentals, including supervised learning, unsupervised learning, and neural networks",
+  "chunkCount": 8,
+  "contentPreview": "# Machine Learning Fundamentals Guide\n\nMachine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed for every task....",
+  "message": "Document generated and stored successfully"
+}
+```
+
+**Features**:
+- Uses Claude 3 to generate comprehensive markdown content
+- Automatically creates filename from prompt
+- Follows same processing pipeline as uploaded documents
+- Content is chunked, embedded, and stored in Pinecone
+- Supports markdown formatting with headers, lists, code blocks
+
+**Important**: Save the `documentId` for document operations!
+
+---
+
+### Step 8: List Documents (Auth Required)
 
 **Endpoint**: `GET /documents`
 
@@ -229,7 +284,7 @@ curl -X GET "{API_URL}/documents?knowledgeDbId=kb-uuid-456" \
 
 ---
 
-### Step 8: Get Document Details (Auth Required)
+### Step 9: Get Document Details (Auth Required)
 
 **Endpoint**: `GET /documents/{doc_id}`
 
@@ -255,7 +310,7 @@ curl -X GET {API_URL}/documents/doc-uuid-789 \
 
 ---
 
-### Step 9: Search Documents (Auth Required)
+### Step 10: Search Documents (Auth Required)
 
 **Endpoint**: `POST /search`
 
@@ -289,7 +344,7 @@ curl -X POST {API_URL}/search \
 
 ---
 
-### Step 10: Reindex Document (Auth Required)
+### Step 11: Reindex Document (Auth Required)
 
 **Endpoint**: `POST /documents/reindex`
 
@@ -313,7 +368,213 @@ curl -X POST {API_URL}/documents/reindex \
 
 ---
 
-### Step 11: Refresh Token (No Auth Required)
+### Step 12: Upload Image (Auth Required)
+
+**Endpoint**: `POST /images/upload`
+
+```bash
+# Upload using multipart form data
+curl -X POST {API_URL}/images/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@screenshot.png" \
+  -F "knowledgeDbId=kb-uuid-456"
+```
+
+**Expected Response**:
+```json
+{
+  "imageId": "img-uuid-102",
+  "filename": "screenshot.png",
+  "knowledgeDbId": "kb-uuid-456",
+  "description": "A screenshot showing a web application interface with navigation menu, content area, and sidebar. The image contains text elements, buttons, and form fields in a modern design layout.",
+  "message": "Image uploaded and processed successfully"
+}
+```
+
+**Supported Image Types**:
+- **PNG**: `image/png`
+- **JPEG**: `image/jpeg`
+- **GIF**: `image/gif`
+- **WebP**: `image/webp`
+
+**File Size Limit**: 5MB
+
+**Error Examples**:
+```bash
+# Unsupported image type (BMP)
+curl -X POST {API_URL}/images/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@image.bmp"
+# Response: {"error": "BMP images are not supported yet. Please convert to PNG or JPEG format."}
+
+# Non-image file
+curl -X POST {API_URL}/images/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@document.pdf"
+# Response: {"error": "PDF files should be uploaded as documents, not images."}
+```
+
+**Important**: Save the `imageId` for image operations!
+
+---
+
+### Step 13: Generate Image (Auth Required)
+
+**Endpoint**: `POST /images/generate`
+
+```bash
+curl -X POST {API_URL}/images/generate \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -d '{
+    "prompt": "A futuristic AI assistant helping with documents",
+    "provider": "aws",
+    "knowledgeDbId": "kb-uuid-456"
+  }'
+```
+
+**Expected Response**:
+```json
+{
+  "imageId": "img-uuid-101",
+  "prompt": "A futuristic AI assistant helping with documents",
+  "provider": "aws",
+  "knowledgeDbId": "kb-uuid-456",
+  "image": "iVBORw0KGgoAAAANSUhEUgAAA...",
+  "message": "Image generated and stored successfully"
+}
+```
+
+**Important**: Save the `imageId` for image operations!
+
+**Provider Examples**:
+```bash
+# AWS Provider
+curl -X POST {API_URL}/images/generate \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -d '{
+    "prompt": "A detailed technical diagram",
+    "provider": "aws",
+    "knowledgeDbId": "kb-uuid-456"
+  }'
+
+# Azure Provider
+curl -X POST {API_URL}/images/generate \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -d '{
+    "prompt": "A modern office workspace",
+    "provider": "azure",
+    "knowledgeDbId": "kb-uuid-456"
+  }'
+```
+
+---
+
+### Step 14: List Images (Auth Required)
+
+**Endpoint**: `GET /images`
+
+```bash
+# List all images for user
+curl -X GET {API_URL}/images \
+  -H "Authorization: Bearer {ACCESS_TOKEN}"
+
+# List images in specific KnowledgeDB
+curl -X GET "{API_URL}/images?knowledgeDbId=kb-uuid-456" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}"
+```
+
+**Expected Response**:
+```json
+{
+  "images": [
+    {
+      "imageId": "img-uuid-101",
+      "filename": "img-uuid-101.png",
+      "knowledgeDbId": "kb-uuid-456",
+      "prompt": "A futuristic AI assistant helping with documents",
+      "provider": "aws",
+      "fileSize": 245760,
+      "createdAt": "2024-01-15T10:45:00.000Z",
+      "status": "generated"
+    }
+  ],
+  "count": 1
+}
+```
+
+---
+
+### Step 15: Get Image Details (Auth Required)
+
+**Endpoint**: `GET /images/{image_id}`
+
+```bash
+curl -X GET {API_URL}/images/img-uuid-101 \
+  -H "Authorization: Bearer {ACCESS_TOKEN}"
+```
+
+**Expected Response**:
+```json
+{
+  "imageId": "img-uuid-101",
+  "prompt": "A futuristic AI assistant helping with documents",
+  "provider": "aws",
+  "fileSize": 245760,
+  "createdAt": "2024-01-15T10:45:00.000Z",
+  "status": "generated",
+  "downloadUrl": "https://s3.amazonaws.com/bucket/presigned-url..."
+}
+```
+
+---
+
+### Step 16: Regenerate Image (Auth Required)
+
+**Endpoint**: `POST /images/reindex`
+
+```bash
+curl -X POST {API_URL}/images/reindex \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -d '{
+    "imageId": "img-uuid-101"
+  }'
+```
+
+**Expected Response**:
+```json
+{
+  "imageId": "img-uuid-101",
+  "prompt": "A futuristic AI assistant helping with documents",
+  "provider": "aws",
+  "message": "Image regenerated successfully"
+}
+```
+
+---
+
+### Step 17: Delete Image (Auth Required)
+
+**Endpoint**: `DELETE /images/{image_id}`
+
+```bash
+curl -X DELETE {API_URL}/images/img-uuid-101 \
+  -H "Authorization: Bearer {ACCESS_TOKEN}"
+```
+
+**Expected Response**:
+```json
+{
+  "message": "Image with prompt 'A futuristic AI assistant helping with documents' deleted successfully"
+}
+```
+
+---
+
+### Step 18: Refresh Token (No Auth Required)
 
 **Endpoint**: `POST /auth/refresh`
 
@@ -337,7 +598,7 @@ curl -X POST {API_URL}/auth/refresh \
 
 ---
 
-### Step 12: Delete Document (Auth Required)
+### Step 19: Delete Document (Auth Required)
 
 **Endpoint**: `DELETE /documents/{doc_id}`
 
@@ -355,7 +616,7 @@ curl -X DELETE {API_URL}/documents/doc-uuid-789 \
 
 ---
 
-### Step 13: Delete KnowledgeDB (Auth Required)
+### Step 20: Delete KnowledgeDB (Auth Required)
 
 **Endpoint**: `DELETE /knowledgedbs/{knowledge_db_id}`
 
@@ -375,7 +636,7 @@ curl -X DELETE {API_URL}/knowledgedbs/kb-uuid-456 \
 
 ---
 
-### Step 14: Logout (Auth Required)
+### Step 21: Logout (Auth Required)
 
 **Endpoint**: `POST /auth/logout`
 
@@ -433,20 +694,79 @@ curl -X POST {API_URL}/knowledgedbs \
   -d '{"name": "test-documents", "description": "Duplicate test"}'
 ```
 
-2. **Unsupported File Type**:
+2. **Invalid Document Generation Prompt**:
 ```bash
-curl -X POST {API_URL}/documents/upload \
+curl -X POST {API_URL}/documents/generate \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {ACCESS_TOKEN}" \
   -d '{
-    "fileContent": "dGVzdA==",
-    "filename": "test.exe",
-    "fileType": "application/x-executable",
+    "prompt": "",
     "knowledgeDbId": "kb-uuid-456"
   }'
 ```
 
-3. **Non-existent Resource**:
+3. **Invalid Image Generation Prompt**:
+```bash
+curl -X POST {API_URL}/images/generate \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -d '{
+    "prompt": "",
+    "knowledgeDbId": "kb-uuid-456"
+  }'
+```
+
+3. **Unsupported Document File Type**:
+```bash
+# DOC file (not supported)
+curl -X POST {API_URL}/documents/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@document.doc" \
+  -F "knowledgeDbId=kb-uuid-456"
+# Expected: {"error": "DOC files are not supported yet. Please convert to DOCX format."}
+
+# XLSX file (not supported)
+curl -X POST {API_URL}/documents/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@spreadsheet.xlsx" \
+  -F "knowledgeDbId=kb-uuid-456"
+# Expected: {"error": "XLSX files are not supported yet. Please convert to PDF or text format."}
+```
+
+4. **Unsupported Image File Type**:
+```bash
+# BMP file (not supported)
+curl -X POST {API_URL}/images/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@image.bmp"
+# Expected: {"error": "BMP images are not supported yet. Please convert to PNG or JPEG format."}
+
+# Wrong file type for endpoint
+curl -X POST {API_URL}/images/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@document.pdf" \
+  -F "knowledgeDbId=kb-uuid-456"
+# Expected: {"error": "PDF files should be uploaded as documents, not images."}
+```
+
+5. **File Size Limits**:
+```bash
+# Document too large (>10MB)
+curl -X POST {API_URL}/documents/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@large-document.pdf" \
+  -F "knowledgeDbId=kb-uuid-456"
+# Expected: {"error": "File size exceeds 10MB limit"}
+
+# Image too large (>5MB)
+curl -X POST {API_URL}/images/upload \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -F "file=@large-image.png" \
+  -F "knowledgeDbId=kb-uuid-456"
+# Expected: {"error": "Image size exceeds 5MB limit"}
+```
+
+6. **Non-existent Resource**:
 ```bash
 curl -X GET {API_URL}/documents/non-existent-id \
   -H "Authorization: Bearer {ACCESS_TOKEN}"
@@ -552,13 +872,16 @@ A successful test run should demonstrate:
 1. ✅ User can register and login successfully
 2. ✅ JWT tokens work for authenticated endpoints
 3. ✅ KnowledgeDBs can be created, listed, and deleted
-4. ✅ Documents can be uploaded, processed, and searched
-5. ✅ Search returns relevant results with proper sources
-6. ✅ Error handling works correctly for invalid requests
-7. ✅ Token refresh mechanism works
-8. ✅ User data isolation is maintained
-9. ✅ All cleanup operations work properly
-10. ✅ Health checks return proper status
+4. ✅ Documents can be uploaded, generated, processed, and searched
+5. ✅ Document generation using Claude 3 produces quality markdown content
+6. ✅ Search returns relevant results with proper sources
+7. ✅ Image generation works with both AWS and Azure providers
+8. ✅ Different image models produce appropriate results
+9. ✅ Error handling works correctly for invalid requests
+10. ✅ Token refresh mechanism works
+11. ✅ User data isolation is maintained
+12. ✅ All cleanup operations work properly
+13. ✅ Health checks return proper status
 
 ---
 
@@ -573,14 +896,21 @@ The automated script (`automated_api_test.py`) tests the complete user journey:
 4. **Create KnowledgeDB** - Create document collection
 5. **List KnowledgeDBs** - Verify creation
 6. **Upload Document** - Upload and process test document
-7. **List Documents** - Verify upload
-8. **Get Document Details** - Retrieve metadata and download URL
-9. **Search Documents** - Test RAG search functionality
-10. **Reindex Document** - Test document reprocessing
-11. **Refresh Token** - Test token refresh mechanism
-12. **Delete Document** - Clean up document
-13. **Delete KnowledgeDB** - Clean up collection
-14. **User Logout** - End session
+7. **Generate Document** - Generate document using Claude 3
+8. **List Documents** - Verify upload and generation
+9. **Get Document Details** - Retrieve metadata and download URL
+10. **Search Documents** - Test RAG search functionality
+11. **Generate Image** - Test image generation with AI models
+12. **List Images** - Verify image storage
+13. **Get Image Details** - Retrieve image metadata and download URL
+14. **Regenerate Image** - Test image reprocessing
+15. **Reindex Document** - Test document reprocessing
+16. **Refresh Token** - Test token refresh mechanism
+17. **Delete Document** - Clean up uploaded document
+18. **Delete Generated Documents** - Clean up AI-generated documents
+19. **Delete Image** - Clean up generated image
+20. **Delete KnowledgeDB** - Clean up collection
+21. **User Logout** - End session
 
 ### File Upload in Automated Script
 The automated script creates a test document **in-memory** and uploads it as base64:
@@ -630,11 +960,11 @@ file_content_b64 = base64.b64encode(doc_content.encode('utf-8')).decode('utf-8')
 ============================================================
 📊 TEST SUMMARY
 ============================================================
-Total Tests: 14
-Passed: 14
+Total Tests: 19
+Passed: 19
 Failed: 0
 Success Rate: 100.0%
-Duration: 45.32 seconds
+Duration: 52.18 seconds
 
 🎉 ALL TESTS PASSED! API is working correctly.
 ```
@@ -647,9 +977,15 @@ Duration: 45.32 seconds
 - [ ] Create KnowledgeDB with unique name
 - [ ] List KnowledgeDBs shows created items
 - [ ] Upload document (TXT, PDF, DOCX)
+- [ ] Generate document using Claude 3
 - [ ] List documents shows uploaded items
 - [ ] Get document details with download URL
 - [ ] Search returns relevant results
+- [ ] Generate image with AWS and Azure providers
+- [ ] List images shows generated items
+- [ ] Get image details with download URL
+- [ ] Regenerate image creates new version
+- [ ] Delete image removes from storage
 - [ ] Reindex document updates vectors
 - [ ] Refresh token generates new access token
 - [ ] Delete document removes from all stores

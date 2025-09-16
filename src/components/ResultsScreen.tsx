@@ -23,6 +23,9 @@ interface ResultsScreenProps {
   handleLoadMoreHistory: () => void;
   isLoadingHistory: boolean;
   isMessageLoading?: boolean;
+  isLoadingMessages?: boolean;
+  selectedKnowledgeBase?: string;
+  setSelectedKnowledgeBase?: (kbId: string) => void;
 }
 
 export const ResultsScreen: React.FC<ResultsScreenProps> = ({
@@ -42,7 +45,10 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   handleQuerySubmit,
   handleLoadMoreHistory,
   isLoadingHistory,
-  isMessageLoading = false
+  isMessageLoading = false,
+  isLoadingMessages = false,
+  selectedKnowledgeBase,
+  setSelectedKnowledgeBase
 }) => {
   const formatMessageContent = (content: string) => {
     return <ReactMarkdown>{content}</ReactMarkdown>;
@@ -57,6 +63,8 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         navigateToQuery={navigateToQuery}
         currentScreen={currentScreen}
         setCurrentScreen={setCurrentScreen}
+        selectedKnowledgeBase={selectedKnowledgeBase}
+        setSelectedKnowledgeBase={setSelectedKnowledgeBase}
       />
       <div className={`flex-1 flex flex-col ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 h-screen`}>
         <Navbar 

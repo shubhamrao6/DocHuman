@@ -3,7 +3,9 @@ import { Upload, File, FileText } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { DocumentsList } from './DocumentsList';
+import { UploadPopup } from './UploadPopup';
 import { listDocuments, Document } from '../services/documentsService';
+import { listImages, Image } from '../services/imagesService';
 
 interface FileData {
   id: string;
@@ -37,6 +39,8 @@ interface UploadsScreenProps {
   recentlyAccessedFiles: FileData[];
   filteredFiles: FileData[];
   getFileIcon: (type: string) => JSX.Element;
+  selectedKnowledgeBase?: string;
+  setSelectedKnowledgeBase?: (kbId: string) => void;
 }
 
 export const UploadsScreen: React.FC<UploadsScreenProps> = ({
@@ -60,10 +64,14 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
   allFiles,
   recentlyAccessedFiles,
   filteredFiles,
-  getFileIcon: externalGetFileIcon
+  getFileIcon: externalGetFileIcon,
+  selectedKnowledgeBase,
+  setSelectedKnowledgeBase
 }) => {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [images, setImages] = useState<Image[]>([]);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [showUploadPopup, setShowUploadPopup] = useState(false);
 
   useEffect(() => {
     if (uploadView === 'allFiles') {
@@ -74,10 +82,14 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
   const loadDocuments = async () => {
     setIsLoadingDocs(true);
     try {
-      const response = await listDocuments();
-      setDocuments(response.documents);
+      const [docsResponse, imagesResponse] = await Promise.all([
+        listDocuments(),
+        listImages()
+      ]);
+      setDocuments(docsResponse.documents);
+      setImages(imagesResponse.images);
     } catch (error) {
-      console.error('Failed to load documents:', error);
+      console.error('Failed to load documents/images:', error);
     } finally {
       setIsLoadingDocs(false);
     }
@@ -99,6 +111,8 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
         console.log('🔓 UploadsScreen calling navigateToLogin');
         navigateToLogin();
       }}
+      selectedKnowledgeBase={selectedKnowledgeBase}
+      setSelectedKnowledgeBase={setSelectedKnowledgeBase}
     />
     <div className={`flex flex-col min-h-screen ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 bg-black`}>
       <Navbar 
@@ -179,7 +193,7 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
                   <h3 className="text-xl font-semibold text-white mb-2">Upload file(s) to your Knowledge Base</h3>
                   <p className="text-xs text-gray-500 mb-6 font-mono">[ .PDF, .CSV, .TXT, .epub, .docx, .xls, .PNG, .JPEG ]</p>
                   <button 
-                    onClick={handleUploadButtonClick}
+                    onClick={() => setShowUploadPopup(true)}
                     className="bg-green-400 text-black font-bold py-3 px-6 rounded-lg hover:bg-green-300 transition-all flex items-center gap-2 mx-auto"
                   >
                     <Upload className="w-4 h-4" />
@@ -231,10 +245,11 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
             ) : (
               <DocumentsList 
                 documents={documents}
+                images={images}
                 isLoading={isLoadingDocs}
                 onRefresh={loadDocuments}
                 showUploadButton={true}
-                onUploadClick={handleUploadButtonClick}
+                onUploadClick={() => setShowUploadPopup(true)}
                 searchPlaceholder="Search through all files"
               />
             )}
@@ -245,6 +260,16 @@ export const UploadsScreen: React.FC<UploadsScreenProps> = ({
 
 
     </div>
+    
+    <UploadPopup 
+      isOpen={showUploadPopup}
+      onClose={() => setShowUploadPopup(false)}
+      selectedKnowledgeBase={selectedKnowledgeBase}
+      onCreateKnowledgeBase={() => {
+        setCurrentScreen('knowledgebase');
+        setShowUploadPopup(false);
+      }}
+    />
   </div>
   );
 };

@@ -18,6 +18,8 @@ interface QueryScreenProps {
   handleQuerySubmit: (e: React.FormEvent) => void;
   handleSuggestionClick: (suggestion: string) => void;
   isMessageLoading?: boolean;
+  selectedKnowledgeBase?: string;
+  setSelectedKnowledgeBase?: (kbId: string) => void;
 }
 
 export const QueryScreen: React.FC<QueryScreenProps> = ({
@@ -34,7 +36,9 @@ export const QueryScreen: React.FC<QueryScreenProps> = ({
   setQuery,
   handleQuerySubmit,
   handleSuggestionClick,
-  isMessageLoading = false
+  isMessageLoading = false,
+  selectedKnowledgeBase,
+  setSelectedKnowledgeBase
 }) => {
   
   return (
@@ -46,6 +50,8 @@ export const QueryScreen: React.FC<QueryScreenProps> = ({
       navigateToQuery={navigateToQuery}
       currentScreen={currentScreen}
       setCurrentScreen={setCurrentScreen}
+      selectedKnowledgeBase={selectedKnowledgeBase}
+      setSelectedKnowledgeBase={setSelectedKnowledgeBase}
     />
     <div className={`flex-1 flex flex-col ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300`}>
       <Navbar 

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Book, Plus, Link, Users, Code, Settings, HelpCircle, LogOut, ChevronDown, FileText, ChevronRight, Sparkles, MessageSquare } from 'lucide-react';
+import { listKnowledgeDbs, KnowledgeDb } from '../services/knowledgeDbService';
 
 interface SidebarProps {
   sidebarCollapsed: boolean;
@@ -9,6 +10,8 @@ interface SidebarProps {
   currentScreen: string;
   setCurrentScreen?: (screen: string) => void;
   handleLogout?: () => void;
+  selectedKnowledgeBase?: string;
+  setSelectedKnowledgeBase?: (kbId: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
@@ -18,9 +21,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
   navigateToQuery,
   currentScreen,
   setCurrentScreen,
-  handleLogout
+  handleLogout,
+  selectedKnowledgeBase,
+  setSelectedKnowledgeBase
 }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeDb[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const loadKbs = async () => {
+      try {
+        const response = await listKnowledgeDbs();
+        setKnowledgeBases(response.knowledgedbs);
+        if (response.knowledgedbs.length > 0 && !selectedKnowledgeBase) {
+          setSelectedKnowledgeBase?.(response.knowledgedbs[0].knowledgeDbId);
+        }
+      } catch (error) {
+        console.error('Failed to load knowledge bases:', error);
+      }
+    };
+    loadKbs();
+  }, [selectedKnowledgeBase, setSelectedKnowledgeBase]);
 
   return (
   <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#0D0D0D] flex flex-col p-4 border-r border-gray-800 transition-all duration-300 fixed left-0 top-0 h-screen z-10`}>
@@ -43,10 +65,62 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <ChevronRight className="w-4 h-4" />
     </button>}
 
-    <button className={`w-full text-left flex items-center gap-3 px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-sm font-medium text-gray-100 hover:bg-gray-800 transition-colors mb-6 ${sidebarCollapsed ? 'justify-center' : ''}`}>
-      <Plus className="w-4 h-4 text-gray-400 flex-shrink-0" />
-      {!sidebarCollapsed && 'New Chat'}
-    </button>
+    {!sidebarCollapsed && (
+      <div className="relative mb-6">
+        {knowledgeBases.length === 0 ? (
+          <button 
+            onClick={() => setCurrentScreen?.('knowledgebase')}
+            className="w-full text-left flex items-center gap-3 px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-sm font-medium text-gray-100 hover:bg-gray-800 transition-colors"
+          >
+            <Plus className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            Create Knowledge Base
+          </button>
+        ) : (
+          <>
+            <button 
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="w-full text-left flex items-center justify-between gap-3 px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-sm font-medium text-gray-100 hover:bg-gray-800 transition-colors"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <Book className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <span className="truncate">
+                  {knowledgeBases.find(kb => kb.knowledgeDbId === selectedKnowledgeBase)?.name || knowledgeBases[0]?.name || 'No Knowledge Base'}
+                </span>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+            </button>
+            {showDropdown && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
+                {knowledgeBases.map((kb) => (
+                  <button
+                    key={kb.knowledgeDbId}
+                    onClick={() => {
+                      setSelectedKnowledgeBase?.(kb.knowledgeDbId);
+                      setShowDropdown(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                  >
+                    <div className="truncate">{kb.name}</div>
+                    <div className="text-xs text-gray-500 truncate">{kb.description}</div>
+                  </button>
+                ))}
+                <div className="border-t border-gray-700">
+                  <button
+                    onClick={() => {
+                      setCurrentScreen?.('knowledgebase');
+                      setShowDropdown(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm text-blue-400 hover:bg-gray-700 transition-colors"
+                  >
+                    + Create New Knowledge Base
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    )}
 
     <nav className="flex-grow space-y-1">
       <span 

@@ -3,8 +3,10 @@ import { Plus, Trash2, Database } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { DocumentsList } from './DocumentsList';
+import { UploadPopup } from './UploadPopup';
 import { createKnowledgeDb, listKnowledgeDbs, deleteKnowledgeDb, KnowledgeDb } from '../services/knowledgeDbService';
 import { listDocuments, Document } from '../services/documentsService';
+import { listImages, Image } from '../services/imagesService';
 
 interface KnowledgeBaseScreenProps {
   sidebarCollapsed: boolean;
@@ -15,6 +17,8 @@ interface KnowledgeBaseScreenProps {
   setCurrentScreen: (screen: string) => void;
   navigateToLogin: () => void;
   currentUser: { firstName: string; lastName: string; email: string } | null;
+  selectedKnowledgeBase?: string;
+  setSelectedKnowledgeBase?: (kbId: string) => void;
 }
 
 export const KnowledgeBaseScreen: React.FC<KnowledgeBaseScreenProps> = ({
@@ -25,7 +29,9 @@ export const KnowledgeBaseScreen: React.FC<KnowledgeBaseScreenProps> = ({
   currentScreen,
   setCurrentScreen,
   navigateToLogin,
-  currentUser
+  currentUser,
+  selectedKnowledgeBase,
+  setSelectedKnowledgeBase
 }) => {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeDb[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +40,9 @@ export const KnowledgeBaseScreen: React.FC<KnowledgeBaseScreenProps> = ({
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [images, setImages] = useState<Image[]>([]);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [showUploadPopup, setShowUploadPopup] = useState(false);
 
   useEffect(() => {
     loadKnowledgeBases();
@@ -95,10 +103,14 @@ export const KnowledgeBaseScreen: React.FC<KnowledgeBaseScreenProps> = ({
   const loadDocuments = async (knowledgeDbId: string) => {
     setIsLoadingDocs(true);
     try {
-      const response = await listDocuments(knowledgeDbId);
-      setDocuments(response.documents);
+      const [docsResponse, imagesResponse] = await Promise.all([
+        listDocuments(knowledgeDbId),
+        listImages(knowledgeDbId)
+      ]);
+      setDocuments(docsResponse.documents);
+      setImages(imagesResponse.images);
     } catch (error) {
-      console.error('Failed to load documents:', error);
+      console.error('Failed to load documents/images:', error);
     } finally {
       setIsLoadingDocs(false);
     }
@@ -113,6 +125,8 @@ export const KnowledgeBaseScreen: React.FC<KnowledgeBaseScreenProps> = ({
         navigateToQuery={navigateToQuery}
         currentScreen={currentScreen}
         setCurrentScreen={setCurrentScreen}
+        selectedKnowledgeBase={selectedKnowledgeBase}
+        setSelectedKnowledgeBase={setSelectedKnowledgeBase}
       />
       <div className={`flex-1 flex flex-col ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300`}>
         <Navbar 
@@ -242,16 +256,24 @@ export const KnowledgeBaseScreen: React.FC<KnowledgeBaseScreenProps> = ({
             <div className="mt-8">
               <DocumentsList 
                 documents={documents}
+                images={images}
                 isLoading={isLoadingDocs}
                 onRefresh={() => loadDocuments(selectedKbId)}
                 showUploadButton={true}
-                onUploadClick={() => console.log('Upload to KB:', selectedKbId)}
+                onUploadClick={() => setShowUploadPopup(true)}
                 searchPlaceholder={`Search through ${knowledgeBases.find(kb => kb.knowledgeDbId === selectedKbId)?.name || 'knowledge base'}`}
               />
             </div>
           )}
         </main>
       </div>
+      
+      <UploadPopup 
+        isOpen={showUploadPopup}
+        onClose={() => setShowUploadPopup(false)}
+        selectedKnowledgeBase={selectedKbId}
+        onCreateKnowledgeBase={() => setShowCreateForm(true)}
+      />
     </div>
   );
 };
